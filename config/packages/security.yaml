@@ -17,12 +17,6 @@ security:
             lazy: true
             provider: app_user_provider
             custom_authenticator: App\Security\LoginFormAuthenticator
-#            entry_point: App\Security\LoginFormAuthenticator
-#            entry_point: form_login
-#            form_login:
-#                login_path: app_login
-#                check_path: app_login
-#                default_target_path: app_index
 
             logout:
                 path: app_logout
