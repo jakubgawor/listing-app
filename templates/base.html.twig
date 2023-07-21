@@ -1,16 +1,97 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text></svg>">
-        {% block stylesheets %}
-        {% endblock %}
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="icon"
+          href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text></svg>">
 
-        {% block javascripts %}
-        {% endblock %}
-    </head>
-    <body>
-        {% block body %}{% endblock %}
-    </body>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    {% block stylesheets %}
+    {% endblock %}
+
+    {% for message in app.flashes('success') %}
+        <script>
+            window.onload = function () {
+                var message = "{{ message }}";
+
+                if (message) {
+                    var alertBox = document.createElement("div");
+                    alertBox.className = "bg-green-500 text-white text-xs font-semibold border px-2 py-1 rounded-md";
+                    alertBox.textContent = message;
+
+                    alertBox.style.position = "fixed";
+                    alertBox.style.bottom = "20px";
+                    alertBox.style.right = "20px";
+                    alertBox.style.zIndex = "9999";
+
+                    document.body.appendChild(alertBox);
+
+                    setTimeout(function () {
+                        document.body.removeChild(alertBox);
+                    }, 5000);
+                }
+            };
+        </script>
+    {% endfor %}
+
+    {% for message in app.flashes('notification') %}
+        <script>
+            window.onload = function () {
+                var message = "{{ message }}";
+
+                if (message) {
+                    var alertBox = document.createElement("div");
+                    alertBox.className = "bg-indigo-600 text-white text-xs font-semibold border px-2 py-1 rounded-md";
+                    alertBox.textContent = message;
+
+                    alertBox.style.position = "fixed";
+                    alertBox.style.bottom = "20px";
+                    alertBox.style.right = "20px";
+                    alertBox.style.zIndex = "9999";
+
+                    document.body.appendChild(alertBox);
+
+                    setTimeout(function () {
+                        document.body.removeChild(alertBox);
+                    }, 5000);
+                }
+            };
+        </script>
+    {% endfor %}
+
+    {% for message in app.flashes('error') %}
+        <script>
+            window.onload = function () {
+                var message = "{{ message }}";
+
+                if (message) {
+                    var alertBox = document.createElement("div");
+                    alertBox.className = "bg-red-400 text-white text-xs font-semibold border px-2 py-1 rounded-md";
+                    alertBox.textContent = message;
+
+                    alertBox.style.position = "fixed";
+                    alertBox.style.bottom = "20px";
+                    alertBox.style.right = "20px";
+                    alertBox.style.zIndex = "9999";
+
+                    document.body.appendChild(alertBox);
+
+                    setTimeout(function () {
+                        document.body.removeChild(alertBox);
+                    }, 5000);
+                }
+            };
+        </script>
+    {% endfor %}
+
+    {% block javascripts %}
+    {% endblock %}
+
+</head>
+<body>
+{{ include('partials/_nav.html.twig') }}
+{% block body %}{% endblock %}
+</body>
 </html>
