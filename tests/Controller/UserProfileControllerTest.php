@@ -15,7 +15,7 @@ class UserProfileControllerTest extends UserBaseTest
         $client = static::createClient();
         $user = $this->createUser();
 
-        $crawler = $client->request('GET', '/user/' . $user->getUsername());
+        $client->request('GET', '/user/' . $user->getUsername());
 
         $this->assertNull($client->getRequest()->getUser());
         $this->assertResponseStatusCodeSame(302);
@@ -28,12 +28,12 @@ class UserProfileControllerTest extends UserBaseTest
         $user = $this->createUser();
         $client->loginUser($user);
 
-        $crawler = $client->request('GET', '/user/' . $user->getUsername());
+        $client->request('GET', '/user/' . $user->getUsername());
 
         $this->assertResponseIsSuccessful();
     }
 
-    public function testUserCanEditProfileWithValidData()
+    public function testUserCanEditProfile()
     {
         $client = static::createClient();
         $entityManager = static::getContainer()->get('doctrine')->getManager();
@@ -42,7 +42,7 @@ class UserProfileControllerTest extends UserBaseTest
 
         $phoneNumber = random_int(111111111, 999999999);
 
-        $crawler = $client->request('POST', '/user/' . $user->getUsername() . '/edit', [
+        $client->request('POST', '/user/' . $user->getUsername() . '/edit', [
             'user_profile_form' => [
                 'first_name' => 'testName',
                 'last_name' => 'testLastName',
@@ -93,7 +93,7 @@ class UserProfileControllerTest extends UserBaseTest
         $user = $this->createUser();
         $client->loginUser($user);
 
-        $crawler = $client->request('GET', '/user/' . $user->getUsername() . '/delete');
+        $client->request('GET', '/user/' . $user->getUsername() . '/delete');
 
         $this->assertNull($client->getRequest()->getUser());
         $this->assertResponseStatusCodeSame(302, $client->getResponse()->getStatusCode());
