@@ -36,6 +36,7 @@ security:
 
 
     role_hierarchy:
+        ROLE_USER: ~
         ROLE_USER_EMAIL_VERIFIED: ROLE_USER
         ROLE_ADMIN: ROLE_USER_EMAIL_VERIFIED
 

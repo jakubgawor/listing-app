@@ -1,20 +1,39 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello UserProfileController!{% endblock %}
+{% block title %}User - {{ user.username }}{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+    <div class="font-bold text-xl">Profile {{ user.username }}:</div>
+    <div>First name: {{ user.userProfile.firstName ?? 'None' }}</div>
+    <div>Last name: {{ user.userProfile.lastName ?? 'None' }}</div>
+    <div>Phone number: {{ user.userProfile.phoneNumber ?? 'None' }}</div>
+    <div>City: {{ user.userProfile.city ?? 'None' }}</div>
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code><a href="{{ 'C:/Users/Admin/Desktop/symfony/ListingApp/src/Controller/UserProfileController.php'|file_link(0) }}">src/Controller/UserProfileController.php</a></code></li>
-        <li>Your template at <code><a href="{{ 'C:/Users/Admin/Desktop/symfony/ListingApp/templates/user_profile/index.html.twig'|file_link(0) }}">templates/user_profile/index.html.twig</a></code></li>
-    </ul>
-</div>
+    {% if (app.user and user.username == app.user.username) %}
+        {#            <div class="bg-gray-500 text-white text-center rounded-md px-3 py-1.5 text-sm font-semibold max-w-sm"> #}
+        {#                Some action #}
+        {#                <div class="text-xs italic font-light">You have to verify your email address to <div> #}
+        {#            </div> #}
+
+        {% if (is_granted('ROLE_USER_EMAIL_VERIFIED')) %}
+            <a href="{{ path('app_user_profile_edit', { username: app.user.username }) }}">
+                <div class="bg-indigo-600 text-white text-center rounded-md px-3 py-1.5 text-sm font-semibold max-w-sm hover:bg-indigo-500">
+                    Edit profile
+                </div>
+            </a>
+        {% endif %}
+    {% endif %}
+
+
+    {#    {% if(app.user and user.username == app.user.username and is_granted('ROLE_USER_EMAIL_VERIFIED')) %} #}
+    {#        <div class="mt-4"> #}
+    {#            <a href="{{ path('app_user_profile_edit') }}" class="underline">Edit profile</a> #}
+    {#        </div> #}
+
+    {#        <div class="mt-4 text-red-500 font-bold"> #}
+    {#            <a href="{{ path('app_profile_delete', { username: app.user.username }) }}" class="underline">Delete profile</a> #}
+    {#        </div> #}
+    {#    {% endif %} #}
+
 {% endblock %}
