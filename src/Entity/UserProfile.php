@@ -4,10 +4,11 @@ namespace App\Entity;
 
 use App\Repository\UserProfileRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserProfileRepository::class)]
-#[UniqueEntity(fields: ['phone_number'], message: 'There is already an account with this phone number')]
+#[UniqueEntity(fields: 'phone_number', message: 'There is already an account with this phone number')]
 class UserProfile
 {
     #[ORM\Id]

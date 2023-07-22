@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Tests\Auth;
+namespace App\Tests\Controller\Auth;
 
 use App\Entity\User;
+use App\Tests\Base\UserBaseTest;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-class SecurityControllerTest extends WebTestCase
+class SecurityControllerTest extends UserBaseTest
 {
     public function testUserCanLogInWithTheCorrectData(): void
     {
@@ -50,25 +51,4 @@ class SecurityControllerTest extends WebTestCase
         $this->assertNull($client->getRequest()->getUser());
     }
 
-
-    protected function createUser(): User
-    {
-        $entityManager = self::getContainer()->get('doctrine')->getManager();
-        $passwordHasher = self::getContainer()->get(UserPasswordHasherInterface::class);
-        $uniqueId = uniqid();
-
-        $userEmail = 'login_test_' . $uniqueId . '@login_test.com';
-        $userUsername = 'login_test_' . $uniqueId;
-        $userPassword = 'test_password';
-
-        $user = new User;
-        $user->setEmail($userEmail);
-        $user->setUsername($userUsername);
-        $user->setPassword($passwordHasher->hashPassword($user, 'test_password'));
-
-        $entityManager->persist($user);
-        $entityManager->flush();
-
-        return $user;
-    }
 }
