@@ -2,12 +2,9 @@
 
 namespace App\Tests\Controller\Auth;
 
-use App\Entity\User;
-use App\Tests\Base\UserBaseTest;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use App\Tests\Builder\UserBuilder;
 
-class SecurityControllerTest extends UserBaseTest
+class SecurityControllerTest extends UserBuilder
 {
     public function testUserCanLogInWithTheCorrectData(): void
     {

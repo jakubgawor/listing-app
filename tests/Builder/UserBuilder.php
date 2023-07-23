@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Base;
+namespace App\Tests\Builder;
 
 use App\Entity\User;
 use App\Entity\UserProfile;
@@ -8,9 +8,9 @@ use App\Enum\UserRoleEnum;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-abstract class UserBaseTest extends WebTestCase
+abstract class UserBuilder extends WebTestCase implements UserBuilderInterface
 {
-    protected function createUser(string $phoneNumber = null): User
+    public function createUser(string $phoneNumber = null): User
     {
         $entityManager = self::getContainer()->get('doctrine')->getManager();
         $passwordHasher = self::getContainer()->get(UserPasswordHasherInterface::class);
@@ -21,16 +21,16 @@ abstract class UserBaseTest extends WebTestCase
         $userPassword = 'test_password';
 
         $user = new User;
-        $user->setEmail($userEmail);
-        $user->setUsername($userUsername);
-        $user->setRoles([UserRoleEnum::ROLE_USER_EMAIL_VERIFIED]);
-        $user->setIsVerified(true);
-        $user->setPassword($passwordHasher->hashPassword($user, 'test_password'));
+        $user
+            ->setEmail($userEmail)
+            ->setUsername($userUsername)
+            ->setRoles([UserRoleEnum::ROLE_USER_EMAIL_VERIFIED])
+            ->setIsVerified(true)
+            ->setPassword($passwordHasher->hashPassword($user, $userPassword));
+
         $entityManager->persist($user);
 
-        $userProfile = new UserProfile();
-        $userProfile->setUser($user);
-        $userProfile->setPhoneNumber($phoneNumber);
+        $userProfile = (new UserProfile)->setUser($user)->setPhoneNumber($phoneNumber);
         $entityManager->persist($userProfile);
 
         $entityManager->flush();

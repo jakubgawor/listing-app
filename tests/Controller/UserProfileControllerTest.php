@@ -3,12 +3,11 @@
 namespace App\Tests\Controller;
 
 use App\Entity\UserProfile;
-use App\Tests\Base\UserBaseTest;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use App\Tests\Builder\UserBuilder;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
-class UserProfileControllerTest extends UserBaseTest
+class UserProfileControllerTest extends UserBuilder
 {
     public function testUserProfilePageCanNotBeRenderedIfTheUserIsNotLoggedIn()
     {
