@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\UserProfile;
 
 use App\Entity\User;
 use App\Entity\UserProfile;

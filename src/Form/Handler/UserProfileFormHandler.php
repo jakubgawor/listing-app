@@ -4,7 +4,7 @@ namespace App\Form\Handler;
 
 use App\Entity\User;
 use App\Form\Type\UserProfileFormType;
-use App\Service\UserProfileService;
+use App\Service\UserProfile\UserProfileService;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
