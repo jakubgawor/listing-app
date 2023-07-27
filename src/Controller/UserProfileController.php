@@ -7,6 +7,7 @@ use App\Enum\UserRoleEnum;
 use App\Form\Handler\UserProfileFormHandler;
 use App\Service\AuthorizationService;
 use App\Service\UserProfileService;
+use App\Service\UserService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -56,12 +57,12 @@ class UserProfileController extends AbstractController
     #[IsGranted(UserRoleEnum::ROLE_USER_EMAIL_VERIFIED)]
     public function delete(
         User $user,
-        UserProfileService $userProfileService,
+        UserService $userService,
         AuthorizationService $authorizationService
     ): Response
     {
         $authorizationService->denyUnauthorizedUserAccess($user);
-        $userProfileService->deleteUser($user);
+        $userService->deleteUser($user);
 
         $this->addFlash('success', 'Your profile has been deleted!');
         return $this->redirectToRoute('app_index');
