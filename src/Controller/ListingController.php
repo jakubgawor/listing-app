@@ -8,7 +8,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ListingController extends AbstractController
 {
-    #[Route('/', name: 'app_index', methods: 'GET')]
+    #[Route('/', name: 'app_index')]
     public function index(): Response
     {
         return $this->render('listing/index.html.twig', [
