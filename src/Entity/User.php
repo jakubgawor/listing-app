@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -17,6 +19,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __construct()
     {
         $this->created_at = new \DateTime();
+        $this->listings = new ArrayCollection();
     }
 
     #[ORM\Id]
@@ -47,6 +50,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
     private ?UserProfile $userProfile = null;
+
+    #[ORM\OneToMany(mappedBy: 'belongs_to_user', targetEntity: Listing::class, orphanRemoval: true)]
+    private Collection $listings;
 
     public function getId(): ?int
     {
@@ -167,6 +173,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         }
 
         $this->userProfile = $userProfile;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Listing>
+     */
+    public function getListings(): Collection
+    {
+        return $this->listings;
+    }
+
+    public function addListing(Listing $listing): static
+    {
+        if (!$this->listings->contains($listing)) {
+            $this->listings->add($listing);
+            $listing->setBelongsToUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeListing(Listing $listing): static
+    {
+        if ($this->listings->removeElement($listing)) {
+            // set the owning side to null (unless already changed)
+            if ($listing->getBelongsToUser() === $this) {
+                $listing->setBelongsToUser(null);
+            }
+        }
 
         return $this;
     }
