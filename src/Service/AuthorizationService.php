@@ -4,7 +4,7 @@ namespace App\Service;
 
 use App\Entity\User;
 use App\Exception\UnauthorizedAccessException;
-use App\Security\Voter\UserProfileEditVoter;
+use App\Security\Voter\SameUsernameVoter;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class AuthorizationService
@@ -15,9 +15,10 @@ class AuthorizationService
 
     public function denyUnauthorizedUserAccess(User $user): void
     {
-        if(!$this->authorizationChecker->isGranted(UserProfileEditVoter::IS_SAME_USER, $user->getUserIdentifier())) {
+        if(!$this->authorizationChecker->isGranted(SameUsernameVoter::IS_SAME_USER, $user->getUserIdentifier())) {
             throw new UnauthorizedAccessException('You do not have permissions to access this page!', 403);
         }
+
 
     }
 }

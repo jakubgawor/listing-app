@@ -12,7 +12,7 @@ class ListingService
     {
     }
 
-    public function createListing(Listing $listing, User $user)
+    public function createListing(Listing $listing, User $user): void
     {
         $this->entityManager->persist($listing->setBelongsToUser($user));
         $this->entityManager->flush();

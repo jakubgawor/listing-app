@@ -16,9 +16,9 @@ class ListingFormHandler
     {
     }
 
-    public function handle(User $user, Request $request): bool|FormInterface
+    public function handle(User $user, Request $request, $listing = new Listing): bool|FormInterface
     {
-        $form = $this->formFactory->create(ListingFormType::class, new Listing());
+        $form = $this->formFactory->create(ListingFormType::class, $listing);
         $form->handleRequest($request);
 
         if($form->isSubmitted() && $form->isValid()) {

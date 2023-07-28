@@ -6,7 +6,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class UserProfileEditVoter extends Voter
+class SameUsernameVoter extends Voter
 {
     public const IS_SAME_USER = 'IS_SAME_USER';
 

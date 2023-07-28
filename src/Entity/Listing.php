@@ -52,7 +52,7 @@ class Listing
     public function setUpdatedValues()
     {
         $this->slug = $this->createSlug($this->title);
-        $this->edited = new \DateTime();
+        $this->edited_at = new \DateTime();
     }
 
 
