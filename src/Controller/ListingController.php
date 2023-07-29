@@ -9,6 +9,7 @@ use App\Exception\ListingNotFoundException;
 use App\Form\Handler\ListingFormHandler;
 use App\Repository\ListingRepository;
 use App\Service\AuthorizationService;
+use App\Service\Listing\ListingService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -84,11 +85,18 @@ class ListingController extends AbstractController
         ]);
     }
 
-    #[Route('//listing/{slug}/delete', name: 'app_listing_delete')]
+    #[Route('/listing/{slug}/delete', name: 'app_listing_delete')]
     #[IsGranted(UserRoleEnum::ROLE_USER_EMAIL_VERIFIED)]
-    public function delete(): ?Response
+    public function delete(string $slug, AuthorizationService $authorizationService, ListingService $listingService): Response
     {
-        return null;
+        $listing = $this->listingRepository->findOneBySlugAndStatus($slug, ListingStatusEnum::NOT_VERIFIED);
+
+        $authorizationService->denyUnauthorizedUserAccess($listing->getBelongsToUser());
+
+        $listingService->deleteListing($listing);
+
+        $this->addFlash('success', 'Your listing has been deleted!');
+        return $this->redirectToRoute('app_index');
     }
 
 }

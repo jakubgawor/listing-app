@@ -5,7 +5,6 @@ namespace App\Tests\Controller;
 use App\Entity\Listing;
 use App\Enum\ListingStatusEnum;
 use App\Enum\UserRoleEnum;
-use App\Form\Type\ListingFormType;
 use App\Tests\Builder\EntityBuilder;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
@@ -203,5 +202,50 @@ class ListingControllerTest extends EntityBuilder
         $client->request('GET', '/listing/' . $listing->getSlug() . '/edit');
 
         $this->assertSame(500, $client->getResponse()->getStatusCode());
+    }
+
+    public function testUserCanDeleteHisOwnListing(): void
+    {
+        $client = static::createClient();
+        $author = $this->createUser();
+        $client->loginUser($author);
+
+        $listing = $this->createListing($this->faker->realText(20), $this->faker->realText(50), $author);
+
+        $client->request('GET', '/listing/' . $listing->getSlug() . '/delete');
+
+        $this->assertResponseRedirects('/');
+        $this->assertNull($listing->getId());
+    }
+
+    public function testUserCanNotDeleteSomeoneElseListing(): void
+    {
+        $client = static::createClient();
+        $author = $this->createUser();
+        $client->loginUser($author);
+
+        $listing = $this->createListing($this->faker->realText(20), $this->faker->realText(50), $this->createUser());
+
+        $client->request('GET', '/listing/' . $listing->getSlug() . '/delete');
+
+        $this->assertSame(500, $client->getResponse()->getStatusCode());
+        $this->assertNotNull($this->repository->findOneBy([
+            'slug' => $listing->getSlug()
+        ]));
+    }
+
+    public function testNotLoggedUserCanNotDeleteListings(): void
+    {
+        $client = static::createClient();
+
+        $listing = $this->createListing($this->faker->realText(20), $this->faker->realText(50), $this->createUser());
+
+        $client->request('GET', '/listing/' . $listing->getSlug() . '/delete');
+
+        $this->assertSame(302, $client->getResponse()->getStatusCode());
+        $this->assertNotNull($this->repository->findOneBy([
+            'slug' => $listing->getSlug()
+        ]));
+        $this->assertResponseRedirects('/login');
     }
 }

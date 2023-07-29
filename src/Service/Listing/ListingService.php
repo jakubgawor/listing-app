@@ -17,4 +17,10 @@ class ListingService
         $this->entityManager->persist($listing->setBelongsToUser($user));
         $this->entityManager->flush();
     }
+
+    public function deleteListing(Listing $listing): void
+    {
+        $this->entityManager->remove($listing);
+        $this->entityManager->flush();
+    }
 }
