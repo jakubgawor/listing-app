@@ -8,7 +8,6 @@ use App\Enum\ListingStatusEnum;
 use App\Exception\ListingNotFoundException;
 use App\Repository\ListingRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Exception;
 
 class ListingService
 {
@@ -16,9 +15,9 @@ class ListingService
     {
     }
 
-    public function show(string $slug): Listing
+    public function find(string $slug, string $status = ListingStatusEnum::NOT_VERIFIED): Listing
     {
-        $listing = $this->listingRepository->findOneBySlugAndStatus($slug, ListingStatusEnum::NOT_VERIFIED);
+        $listing = $this->listingRepository->findOneBySlugAndStatus($slug, $status);
 
         if ($listing === null) {
             throw new ListingNotFoundException('Listing not found', 404);
@@ -27,7 +26,7 @@ class ListingService
         return $listing;
     }
 
-    public function createListing(Listing $listing, User $user): void
+    public function create(Listing $listing, User $user): void
     {
         $this->entityManager->persist($listing->setBelongsToUser($user));
         $this->entityManager->flush();

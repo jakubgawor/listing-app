@@ -23,7 +23,7 @@ class ListingFormHandler
 
         if ($form->isSubmitted() && $form->isValid()) {
             $listing = $form->getData();
-            $this->listingService->createListing($listing, $user);
+            $this->listingService->create($listing, $user);
 
             return true;
         }

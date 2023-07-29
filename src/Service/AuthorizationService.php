@@ -18,7 +18,5 @@ class AuthorizationService
         if(!$this->authorizationChecker->isGranted(SameUsernameVoter::IS_SAME_USER, $user->getUserIdentifier())) {
             throw new UnauthorizedAccessException('You do not have permissions to access this page!', 403);
         }
-
-
     }
 }

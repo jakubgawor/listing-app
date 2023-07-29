@@ -202,7 +202,8 @@ class ListingControllerTest extends EntityBuilder
 
         $client->request('GET', '/listing/' . $listing->getSlug() . '/edit');
 
-        $this->assertSame(500, $client->getResponse()->getStatusCode());
+        $this->assertSame(302, $client->getResponse()->getStatusCode());
+        $this->assertResponseRedirects('/');
     }
 
     public function testUserCanDeleteHisOwnListing(): void
@@ -229,7 +230,8 @@ class ListingControllerTest extends EntityBuilder
 
         $client->request('GET', '/listing/' . $listing->getSlug() . '/delete');
 
-        $this->assertSame(500, $client->getResponse()->getStatusCode());
+        $this->assertSame(302, $client->getResponse()->getStatusCode());
+        $this->assertResponseRedirects('/');
         $this->assertNotNull($this->repository->findOneBy([
             'slug' => $listing->getSlug()
         ]));
