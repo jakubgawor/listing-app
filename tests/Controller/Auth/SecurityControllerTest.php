@@ -2,9 +2,9 @@
 
 namespace App\Tests\Controller\Auth;
 
-use App\Tests\Builder\UserBuilder;
+use App\Tests\Builder\EntityBuilder;
 
-class SecurityControllerTest extends UserBuilder
+class SecurityControllerTest extends EntityBuilder
 {
     public function testUserCanLogInWithTheCorrectData(): void
     {

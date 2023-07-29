@@ -16,12 +16,12 @@ class ListingFormHandler
     {
     }
 
-    public function handle(User $user, Request $request, $listing = new Listing): bool|FormInterface
+    public function handle(User $user, Request $request, Listing $listing = new Listing): bool|FormInterface
     {
         $form = $this->formFactory->create(ListingFormType::class, $listing);
         $form->handleRequest($request);
 
-        if($form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $listing = $form->getData();
             $this->listingService->createListing($listing, $user);
 

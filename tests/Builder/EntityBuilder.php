@@ -2,15 +2,17 @@
 
 namespace App\Tests\Builder;
 
+use App\Entity\Listing;
 use App\Entity\User;
 use App\Entity\UserProfile;
 use App\Enum\UserRoleEnum;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-abstract class UserBuilder extends WebTestCase implements UserBuilderInterface
+abstract class EntityBuilder extends WebTestCase implements EntityBuilderInterface
 {
-    public function createUser(string $phoneNumber = null): User
+
+    public function createUser(string $phoneNumber = null, string $role = UserRoleEnum::ROLE_USER_EMAIL_VERIFIED, bool $isVerfified = true): User
     {
         $entityManager = self::getContainer()->get('doctrine')->getManager();
         $passwordHasher = self::getContainer()->get(UserPasswordHasherInterface::class);
@@ -24,8 +26,8 @@ abstract class UserBuilder extends WebTestCase implements UserBuilderInterface
         $user
             ->setEmail($userEmail)
             ->setUsername($userUsername)
-            ->setRoles([UserRoleEnum::ROLE_USER_EMAIL_VERIFIED])
-            ->setIsVerified(true)
+            ->setRoles([$role])
+            ->setIsVerified($isVerfified)
             ->setPassword($passwordHasher->hashPassword($user, $userPassword));
 
         $entityManager->persist($user);
@@ -38,4 +40,19 @@ abstract class UserBuilder extends WebTestCase implements UserBuilderInterface
         return $user;
     }
 
+    public function createListing(string $title, string $description, User $user): Listing
+    {
+        $entityManager = self::getContainer()->get('doctrine')->getManager();
+
+        $listing = new Listing;
+        $listing
+            ->setTitle($title)
+            ->setDescription($description)
+            ->setBelongsToUser($user);
+
+        $entityManager->persist($listing);
+        $entityManager->flush();
+
+        return $listing;
+    }
 }

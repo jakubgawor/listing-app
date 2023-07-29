@@ -7,7 +7,6 @@ use App\Enum\ListingStatusEnum;
 use App\Enum\UserRoleEnum;
 use App\Exception\ListingNotFoundException;
 use App\Form\Handler\ListingFormHandler;
-use App\Form\Type\ListingFormType;
 use App\Repository\ListingRepository;
 use App\Service\AuthorizationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -29,17 +28,17 @@ class ListingController extends AbstractController
     public function index(): Response
     {
         return $this->render('listing/index.html.twig', [
-            'listings' => $this->listingRepository->findByStatus(ListingStatusEnum::NOT_VERIFIED)
+            'listings' => $this->listingRepository->findByStatus(ListingStatusEnum::NOT_VERIFIED) //todo admin
         ]);
     }
 
     #[Route('/listing/{slug}', name: 'app_show_listing')]
     public function showListing(string $slug): Response
     {
-        $listing = $this->listingRepository->findOneBySlugAndStatus($slug, ListingStatusEnum::NOT_VERIFIED);
+        $listing = $this->listingRepository->findOneBySlugAndStatus($slug, ListingStatusEnum::NOT_VERIFIED); //todo admin
 
         if ($listing === null) {
-            throw new ListingNotFoundException('Listing not found', 404);
+            throw new ListingNotFoundException('Listing not found');
         }
 
         return $this->render('listing/showListing.html.twig', [
@@ -72,7 +71,7 @@ class ListingController extends AbstractController
         $listing = $this->listingRepository->findOneBySlugAndStatus($slug, ListingStatusEnum::NOT_VERIFIED);
 
         $authorizationService->denyUnauthorizedUserAccess($listing->getBelongsToUser());
-        $form = $this->listingFormHandler->handle($listing->getBelongsToUser(), $request, $listing);
+        $form = $this->listingFormHandler->handle($this->getUser(), $request, $listing);
 
         if ($form === true) {
 
@@ -85,5 +84,11 @@ class ListingController extends AbstractController
         ]);
     }
 
+    #[Route('//listing/{slug}/delete', name: 'app_listing_delete')]
+    #[IsGranted(UserRoleEnum::ROLE_USER_EMAIL_VERIFIED)]
+    public function delete(): ?Response
+    {
+        return null;
+    }
 
 }

@@ -18,7 +18,7 @@ class RegistrationControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
     }
 
-    public function testUserCanRegisterWithValidForm()
+    public function testUserCanRegisterWithValidForm(): void
     {
         $client = static::createClient();
 
