@@ -63,7 +63,8 @@ class ListingControllerTest extends EntityBuilder
 
         $client->request('GET', '/listing/not-existing');
 
-        $this->assertSame(500, $client->getResponse()->getStatusCode());
+        $this->assertSame(302, $client->getResponse()->getStatusCode());
+        $this->assertResponseRedirects('/');
     }
 
     public function testCreateListingPageCanBeRenderedWhileUserIsLoggedIn(): void

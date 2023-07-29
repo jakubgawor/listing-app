@@ -34,12 +34,13 @@ class ListingController extends AbstractController
     }
 
     #[Route('/listing/{slug}', name: 'app_show_listing')]
-    public function showListing(string $slug): Response
+    public function showListing(string $slug, ListingService $listingService): Response
     {
-        $listing = $this->listingRepository->findOneBySlugAndStatus($slug, ListingStatusEnum::NOT_VERIFIED); //todo admin
-
-        if ($listing === null) {
-            throw new ListingNotFoundException('Listing not found');
+        try {
+            $listing = $listingService->show($slug);
+        } catch (ListingNotFoundException $exception) {
+            $this->addFlash('error', $exception->getMessage());
+            return $this->redirectToRoute('app_index');
         }
 
         return $this->render('listing/showListing.html.twig', [

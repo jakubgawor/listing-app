@@ -38,6 +38,7 @@ class ListingRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('l')
             ->where('l.status = :status')
             ->setParameter('status', $status)
+            ->orderBy('l.created_at', 'DESC')
             ->getQuery()
             ->getResult();
     }
