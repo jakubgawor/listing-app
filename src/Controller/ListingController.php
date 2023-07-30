@@ -71,15 +71,7 @@ class ListingController extends AbstractController
     #[IsGranted(UserRoleEnum::ROLE_USER_EMAIL_VERIFIED)]
     public function edit(string $slug, Request $request, AuthorizationService $authorizationService): Response
     {
-        try {
-            $listing = $this->listingService->find($slug);
-            $authorizationService->denyUnauthorizedUserAccess($listing->getBelongsToUser());
-        } catch (\Exception $exception) {
-            $this->addFlash('error', $exception->getMessage());
-            return $this->redirectToRoute('app_index');
-        }
-
-        $form = $this->listingFormHandler->handle($this->getUser(), $request, $listing);
+        $form = $this->listingFormHandler->handle($this->getUser(), $request, $this->findAndAuthorize($slug));
 
         if ($form === true) {
             $this->addFlash('success', 'Your listing has been updated!');
@@ -95,18 +87,17 @@ class ListingController extends AbstractController
     #[IsGranted(UserRoleEnum::ROLE_USER_EMAIL_VERIFIED)]
     public function delete(string $slug, AuthorizationService $authorizationService, ListingService $listingService): Response
     {
-        try {
-            $listing = $this->listingService->find($slug);
-            $this->authorizationService->denyUnauthorizedUserAccess($listing->getBelongsToUser());
-        } catch (\Exception $exception) {
-            $this->addFlash('error', $exception->getMessage());
-            return $this->redirectToRoute('app_index');
-        }
-
-        $listingService->deleteListing($listing);
+        $listingService->deleteListing($this->findAndAuthorize($slug));
 
         $this->addFlash('success', 'Your listing has been deleted!');
         return $this->redirectToRoute('app_index');
     }
 
+
+    private function findAndAuthorize(string $slug): Listing
+    {
+        $listing = $this->listingService->find($slug);
+        $this->authorizationService->denyUnauthorizedUserAccess($listing->getBelongsToUser());
+        return $listing;
+    }
 }
