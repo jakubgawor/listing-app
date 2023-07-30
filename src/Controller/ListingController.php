@@ -39,12 +39,7 @@ class ListingController extends AbstractController
     #[Route('/listing/{slug}', name: 'app_show_listing')]
     public function showListing(string $slug): Response
     {
-        try {
-            $listing = $this->listingService->find($slug);
-        } catch (ListingNotFoundException $exception) {
-            $this->addFlash('error', $exception->getMessage());
-            return $this->redirectToRoute('app_index');
-        }
+        $listing = $this->listingService->find($slug);
 
         return $this->render('listing/showListing.html.twig', [
             'listing' => $listing
@@ -69,7 +64,7 @@ class ListingController extends AbstractController
 
     #[Route('/listing/{slug}/edit', name: 'app_listing_edit')]
     #[IsGranted(UserRoleEnum::ROLE_USER_EMAIL_VERIFIED)]
-    public function edit(string $slug, Request $request, AuthorizationService $authorizationService): Response
+    public function edit(string $slug, Request $request): Response
     {
         $form = $this->listingFormHandler->handle($this->getUser(), $request, $this->findAndAuthorize($slug));
 
@@ -85,7 +80,7 @@ class ListingController extends AbstractController
 
     #[Route('/listing/{slug}/delete', name: 'app_listing_delete')]
     #[IsGranted(UserRoleEnum::ROLE_USER_EMAIL_VERIFIED)]
-    public function delete(string $slug, AuthorizationService $authorizationService, ListingService $listingService): Response
+    public function delete(string $slug, ListingService $listingService): Response
     {
         $listingService->deleteListing($this->findAndAuthorize($slug));
 

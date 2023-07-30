@@ -16,6 +16,8 @@ class ExceptionSubscriber implements EventSubscriberInterface
         $exception = $event->getThrowable();
 
         if($exception instanceof ListingNotFoundException || $exception instanceof UnauthorizedAccessException) {
+            $event->getRequest()->getSession()->getFlashBag()->add('error', $exception->getMessage());
+
             $response = new RedirectResponse('/');
             $event->setResponse($response);
         }

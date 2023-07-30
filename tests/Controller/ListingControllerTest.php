@@ -30,8 +30,8 @@ class ListingControllerTest extends EntityBuilder
     {
         $author = $this->createUser();
 
-        $title = $this->faker->realText(50);
-        $description = $this->faker->realText(200);
+        $title = $this->faker->realText(15);
+        $description = $this->faker->realText(20);
 
         $this->createListing($title, $description, $author);
 
@@ -50,7 +50,7 @@ class ListingControllerTest extends EntityBuilder
     {
         $client = static::createClient();
         $author = $this->createUser();
-        $listing = $this->createListing($this->faker->realText(20), $this->faker->realText(50), $author);
+        $listing = $this->createListing($this->faker->realText(15), $this->faker->realText(20), $author);
 
         $client->request('GET', '/listing/' . $listing->getSlug());
 
@@ -63,7 +63,8 @@ class ListingControllerTest extends EntityBuilder
 
         $client->request('GET', '/listing/not-existing');
 
-        $this->assertSame(302, $client->getResponse()->getStatusCode());
+        $this->assertResponseStatusCodeSame(302);
+        $this->assertNotNull($client->getRequest()->getSession()->getFlashBag()->get('error'));
         $this->assertResponseRedirects('/');
     }
 
@@ -85,7 +86,7 @@ class ListingControllerTest extends EntityBuilder
 
         $client->request('GET', '/create-listing');
 
-        $this->assertSame(302, $client->getResponse()->getStatusCode());
+        $this->assertResponseStatusCodeSame(302);
         $this->assertResponseRedirects('/login');
     }
 
@@ -95,8 +96,8 @@ class ListingControllerTest extends EntityBuilder
         $user = $this->createUser();
         $client->loginUser($user);
 
-        $title = $this->faker->realText('10');
-        $description = $this->faker->realText('15');
+        $title = $this->faker->realText(10);
+        $description = $this->faker->realText(15);
 
         $crawler = $client->request('GET', '/create-listing');
 
@@ -114,7 +115,7 @@ class ListingControllerTest extends EntityBuilder
         ]);
 
 
-        $this->assertSame(302, $client->getResponse()->getStatusCode());
+        $this->assertResponseStatusCodeSame(302);
         $this->assertNotNull($listing);
         $this->assertSame($user->getId(), $listing->getBelongsToUser()->getId());
         $this->assertSame(ListingStatusEnum::NOT_VERIFIED, $listing->getStatus());
@@ -126,11 +127,11 @@ class ListingControllerTest extends EntityBuilder
         $client = static::createClient();
 
         $client->request('POST', '/create-listing', [
-            'title' => $this->faker->realText('10'),
-            'description' => $this->faker->realText('15')
+            'title' => $this->faker->realText(10),
+            'description' => $this->faker->realText(15)
         ]);
 
-        $this->assertSame(302, $client->getResponse()->getStatusCode());
+        $this->assertResponseStatusCodeSame(302);
         $this->assertResponseRedirects('/login');
     }
 
@@ -140,9 +141,9 @@ class ListingControllerTest extends EntityBuilder
         $user = $this->createUser(null, UserRoleEnum::ROLE_USER, false);
         $client->loginUser($user);
 
-        $crawler = $client->request('GET', '/create-listing');
+        $client->request('GET', '/create-listing');
 
-        $this->assertSame(403, $client->getResponse()->getStatusCode());
+        $this->assertResponseStatusCodeSame(403);
     }
 
     public function testUserCanNotCreateNewListingWithNotVerifiedEmailAddress(): void
@@ -153,7 +154,7 @@ class ListingControllerTest extends EntityBuilder
 
         $client->request('POST', '/create-listing');
 
-        $this->assertSame(403, $client->getResponse()->getStatusCode());
+        $this->assertResponseStatusCodeSame(403);
     }
 
     public function testUserCanEditHisOwnListing(): void
@@ -162,12 +163,12 @@ class ListingControllerTest extends EntityBuilder
         $author = $this->createUser();
         $client->loginUser($author);
 
-        $listing = $this->createListing($this->faker->realText(20), $this->faker->realText(50), $author);
+        $listing = $this->createListing($this->faker->realText(15), $this->faker->realText(20), $author);
 
         $oldSlug = $listing->getSlug();
 
-        $title = $this->faker->realText(10);
-        $description = $this->faker->realText(15);
+        $title = $this->faker->realText(15);
+        $description = $this->faker->realText(20);
 
         $crawler = $client->request('GET', '/listing/' . $oldSlug . '/edit');
         $form = $crawler->selectButton('Edit listing')->form([
@@ -189,6 +190,8 @@ class ListingControllerTest extends EntityBuilder
         ]));
         $this->assertNotNull($editedListing);
         $this->assertNotSame($editedListing->getSlug(), $oldSlug);
+        $this->assertNotNull($editedListing->getEditedAt());
+        $this->assertNotNull($client->getRequest()->getSession()->getFlashBag()->get('success'));
         $this->assertResponseRedirects('/');
     }
 
@@ -198,11 +201,12 @@ class ListingControllerTest extends EntityBuilder
         $user = $this->createUser();
         $client->loginUser($user);
 
-        $listing = $this->createListing($this->faker->realText(20), $this->faker->realText(50), $this->createUser());
+        $listing = $this->createListing($this->faker->realText(15), $this->faker->realText(20), $this->createUser());
 
         $client->request('GET', '/listing/' . $listing->getSlug() . '/edit');
 
-        $this->assertSame(302, $client->getResponse()->getStatusCode());
+        $this->assertResponseStatusCodeSame(302);
+        $this->assertNotNull($client->getRequest()->getSession()->getFlashBag()->get('error'));
         $this->assertResponseRedirects('/');
     }
 
@@ -212,11 +216,12 @@ class ListingControllerTest extends EntityBuilder
         $author = $this->createUser();
         $client->loginUser($author);
 
-        $listing = $this->createListing($this->faker->realText(20), $this->faker->realText(50), $author);
+        $listing = $this->createListing($this->faker->realText(15), $this->faker->realText(20), $author);
 
         $client->request('GET', '/listing/' . $listing->getSlug() . '/delete');
 
         $this->assertResponseRedirects('/');
+        $this->assertNotNull($client->getRequest()->getSession()->getFlashBag()->get('success'));
         $this->assertNull($listing->getId());
     }
 
@@ -226,12 +231,13 @@ class ListingControllerTest extends EntityBuilder
         $author = $this->createUser();
         $client->loginUser($author);
 
-        $listing = $this->createListing($this->faker->realText(20), $this->faker->realText(50), $this->createUser());
+        $listing = $this->createListing($this->faker->realText(15), $this->faker->realText(20), $this->createUser());
 
         $client->request('GET', '/listing/' . $listing->getSlug() . '/delete');
 
-        $this->assertSame(302, $client->getResponse()->getStatusCode());
+        $this->assertResponseStatusCodeSame(302);
         $this->assertResponseRedirects('/');
+        $this->assertNotNull($client->getRequest()->getSession()->getFlashBag()->get('error'));
         $this->assertNotNull($this->repository->findOneBy([
             'slug' => $listing->getSlug()
         ]));
@@ -245,10 +251,23 @@ class ListingControllerTest extends EntityBuilder
 
         $client->request('GET', '/listing/' . $listing->getSlug() . '/delete');
 
-        $this->assertSame(302, $client->getResponse()->getStatusCode());
+        $this->assertResponseStatusCodeSame(302);
         $this->assertNotNull($this->repository->findOneBy([
             'slug' => $listing->getSlug()
         ]));
         $this->assertResponseRedirects('/login');
+    }
+
+    public function testUserCanNotDeleteNotExistingListing(): void
+    {
+        $client = static::createClient();
+        $user = $this->createUser();
+        $client->loginUser($user);
+
+        $client->request('GET', '/listing/not-exist/delete');
+
+        $this->assertResponseRedirects('/');
+        $this->assertNotNull($client->getRequest()->getSession()->getFlashBag()->get('error'));
+        $this->assertSame(302, $client->getResponse()->getStatusCode());
     }
 }
