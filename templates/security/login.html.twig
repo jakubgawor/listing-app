@@ -16,7 +16,7 @@
             {% endif %}
 
             <form class="space-y-6" action="{{ path('app_login') }}" method="POST">
-                <input type="hidden" id="csrf_token" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                <input type="hidden" id="csrf_token" name="_csrf_token" value="{{ app.environment == 'test' ? '' : csrf_token('authenticate') }}">
 
                 <div>
                     <label for="username" class="block text-sm font-medium leading-6 text-gray-900">Username</label>

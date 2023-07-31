@@ -5,8 +5,6 @@ namespace App\Controller;
 use App\Entity\Listing;
 use App\Enum\ListingStatusEnum;
 use App\Enum\UserRoleEnum;
-use App\Exception\ListingNotFoundException;
-use App\Exception\UnauthorizedAccessException;
 use App\Form\Handler\ListingFormHandler;
 use App\Repository\ListingRepository;
 use App\Service\AuthorizationService;
@@ -20,10 +18,10 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class ListingController extends AbstractController
 {
     public function __construct(
-        private ListingRepository    $listingRepository,
-        private ListingFormHandler   $listingFormHandler,
-        private ListingService       $listingService,
-        private AuthorizationService $authorizationService
+        private readonly ListingRepository  $listingRepository,
+        private readonly ListingFormHandler $listingFormHandler,
+        private readonly ListingService     $listingService,
+        private readonly AuthorizationService $authorizationService
     )
     {
     }

@@ -15,11 +15,15 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class UserProfileController extends AbstractController
 {
+    public function __construct(
+        private readonly AuthorizationService $authorizationService
+    )
+    {
+    }
+
     #[Route('/user/{username}', name: 'app_user_profile')]
     #[IsGranted(UserRoleEnum::ROLE_USER)]
-    public function index(
-        User $user
-    ): Response
+    public function index(User $user): Response
     {
         return $this->render('user_profile/index.html.twig', [
             'user' => $user
@@ -28,14 +32,9 @@ class UserProfileController extends AbstractController
 
     #[Route('/user/{username}/edit', name: 'app_user_profile_edit')]
     #[IsGranted(UserRoleEnum::ROLE_USER_EMAIL_VERIFIED)]
-    public function edit(
-        Request $request,
-        User $user,
-        AuthorizationService $authorizationService,
-        UserProfileFormHandler $userProfileFormHandler
-    ): Response
+    public function edit(Request $request, User $user, UserProfileFormHandler $userProfileFormHandler): Response
     {
-        $authorizationService->denyUnauthorizedUserAccess($user);
+        $this->authorizationService->denyUnauthorizedUserAccess($user);
 
         $form = $userProfileFormHandler->handle($user, $request);
 
@@ -54,13 +53,9 @@ class UserProfileController extends AbstractController
 
     #[Route('/user/{username}/delete', name: 'app_user_profile_delete', methods: 'GET')]
     #[IsGranted(UserRoleEnum::ROLE_USER_EMAIL_VERIFIED)]
-    public function delete(
-        User $user,
-        UserService $userService,
-        AuthorizationService $authorizationService
-    ): Response
+    public function delete(User $user, UserService $userService): Response
     {
-        $authorizationService->denyUnauthorizedUserAccess($user);
+        $this->authorizationService->denyUnauthorizedUserAccess($user);
         $userService->deleteUser($user);
 
         $this->addFlash('success', 'Your profile has been deleted!');

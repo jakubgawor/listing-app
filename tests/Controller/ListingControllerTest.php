@@ -64,7 +64,7 @@ class ListingControllerTest extends EntityBuilder
         $client->request('GET', '/listing/not-existing');
 
         $this->assertResponseStatusCodeSame(302);
-        $this->assertNotNull($client->getRequest()->getSession()->getFlashBag()->get('error'));
+        $this->assertNotEmpty($client->getRequest()->getSession()->getFlashBag()->get('error'));
         $this->assertResponseRedirects('/');
     }
 
@@ -191,7 +191,7 @@ class ListingControllerTest extends EntityBuilder
         $this->assertNotNull($editedListing);
         $this->assertNotSame($editedListing->getSlug(), $oldSlug);
         $this->assertNotNull($editedListing->getEditedAt());
-        $this->assertNotNull($client->getRequest()->getSession()->getFlashBag()->get('success'));
+        $this->assertNotEmpty($client->getRequest()->getSession()->getFlashBag()->get('success'));
         $this->assertResponseRedirects('/');
     }
 
@@ -206,7 +206,7 @@ class ListingControllerTest extends EntityBuilder
         $client->request('GET', '/listing/' . $listing->getSlug() . '/edit');
 
         $this->assertResponseStatusCodeSame(302);
-        $this->assertNotNull($client->getRequest()->getSession()->getFlashBag()->get('error'));
+        $this->assertNotEmpty($client->getRequest()->getSession()->getFlashBag()->get('error'));
         $this->assertResponseRedirects('/');
     }
 
@@ -221,7 +221,7 @@ class ListingControllerTest extends EntityBuilder
         $client->request('GET', '/listing/' . $listing->getSlug() . '/delete');
 
         $this->assertResponseRedirects('/');
-        $this->assertNotNull($client->getRequest()->getSession()->getFlashBag()->get('success'));
+        $this->assertNotEmpty($client->getRequest()->getSession()->getFlashBag()->get('success'));
         $this->assertNull($listing->getId());
     }
 
@@ -237,7 +237,7 @@ class ListingControllerTest extends EntityBuilder
 
         $this->assertResponseStatusCodeSame(302);
         $this->assertResponseRedirects('/');
-        $this->assertNotNull($client->getRequest()->getSession()->getFlashBag()->get('error'));
+        $this->assertNotEmpty($client->getRequest()->getSession()->getFlashBag()->get('error'));
         $this->assertNotNull($this->repository->findOneBy([
             'slug' => $listing->getSlug()
         ]));
@@ -267,7 +267,7 @@ class ListingControllerTest extends EntityBuilder
         $client->request('GET', '/listing/not-exist/delete');
 
         $this->assertResponseRedirects('/');
-        $this->assertNotNull($client->getRequest()->getSession()->getFlashBag()->get('error'));
+        $this->assertNotEmpty($client->getRequest()->getSession()->getFlashBag()->get('error'));
         $this->assertSame(302, $client->getResponse()->getStatusCode());
     }
 }

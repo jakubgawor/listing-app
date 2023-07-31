@@ -6,46 +6,60 @@ use App\Tests\Builder\EntityBuilder;
 
 class SecurityControllerTest extends EntityBuilder
 {
-    public function testUserCanLogInWithTheCorrectData(): void
+    public function testLoginPageCanBeRenderedWhileUserIsNotLoggedIn(): void
     {
         $client = static::createClient();
 
-        $user = $this->createUser();
+        $client->request('GET', '/login');
 
-        $crawler = $client->request('POST', '/login', [
-            '_username' => $user->getUsername(),
-            '_password' => 'test_password'
-        ]);
-
-        $this->assertSame(302, $client->getResponse()->getStatusCode());
+        $this->assertResponseIsSuccessful();
     }
 
-    public function testUserEntersWrongPassword(): void
+    public function testLoginPageCanNotBeRenderedWhileUserIsLoggedIn(): void
     {
         $client = static::createClient();
-
         $user = $this->createUser();
+        $client->loginUser($user);
 
-        $crawler = $client->request('POST', '/login', [
-            '_username' => $user->getUsername(),
-            '_password' => 'wrong_password'
-        ]);
+        $client->request('GET', '/login');
 
-        $this->assertNull($client->getRequest()->getUser());
+        $this->assertResponseRedirects('/');
+        $this->assertResponseStatusCodeSame(302);
+        $this->assertNotEmpty($client->getRequest()->getSession()->getFlashBag()->get('error'));
     }
 
-    public function testUserEntersWrongUsername(): void
+    public function testUserCanLogOut(): void
+    {
+        $client = static::createClient();
+        $user = $this->createUser();
+        $client->loginUser($user);
+
+        $client->request('GET', '/logout');
+
+        $this->assertResponseStatusCodeSame(302);
+    }
+
+    public function testUserCanNotLogOutWhileNotLoggedIn(): void
     {
         $client = static::createClient();
 
-        $this->createUser();
+        $client->request('GET', '/logout');
 
-        $crawler = $client->request('POST', '/login', [
-            '_username' => 'wrong_username',
-            '_password' => 'test_password'
-        ]);
+        $this->assertResponseStatusCodeSame(302);
+    }
 
-        $this->assertNull($client->getRequest()->getUser());
+    public function testUserCanNotRenderLoginPageWhileLoggedIn(): void
+    {
+        $client = static::createClient();
+        $user = $this->createUser();
+
+        $client->loginUser($user);
+
+        $client->request('GET', '/login');
+
+        $this->assertResponseStatusCodeSame(302);
+        $this->assertResponseRedirects('/');
+        $this->assertNotEmpty($client->getRequest()->getSession()->getFlashBag()->get('error'));
     }
 
 }

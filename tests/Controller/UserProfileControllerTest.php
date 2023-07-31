@@ -3,13 +3,25 @@
 namespace App\Tests\Controller;
 
 use App\Entity\UserProfile;
+use App\Enum\UserRoleEnum;
 use App\Tests\Builder\EntityBuilder;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 
 class UserProfileControllerTest extends EntityBuilder
 {
-    public function testUserProfilePageCanNotBeRenderedIfTheUserIsNotLoggedIn()
+    private EntityManagerInterface $entityManager;
+    private EntityRepository $repository;
+
+    public function setUp(): void
+    {
+        $this->entityManager = static::getContainer()->get('doctrine')->getManager();
+        $this->repository = $this->entityManager->getRepository(UserProfile::class);
+
+        self::ensureKernelShutdown();
+    }
+
+    public function testUserProfilePageCanNotBeRenderedIfTheUserIsNotLoggedIn(): void
     {
         $client = static::createClient();
         $user = $this->createUser();
@@ -21,7 +33,7 @@ class UserProfileControllerTest extends EntityBuilder
         $this->assertResponseRedirects('/login');
     }
     
-    public function testUserProfilePageCanBeRenderedIfTheUserIsLoggedIn(): void
+    public function testUserProfilePageCanBeRenderedIfTheUserIsLoggedInAndHasVerifiedEmail(): void
     {
         $client = static::createClient();
         $user = $this->createUser();
@@ -32,10 +44,20 @@ class UserProfileControllerTest extends EntityBuilder
         $this->assertResponseIsSuccessful();
     }
 
-    public function testUserCanEditProfile()
+    public function testUserProfilePageCanBeRenderedIfTheUserIsLoggedInAndHasNotVerifiedEmail(): void
     {
         $client = static::createClient();
-        $entityManager = static::getContainer()->get('doctrine')->getManager();
+        $user = $this->createUser(null, UserRoleEnum::ROLE_USER, false);
+        $client->loginUser($user);
+
+        $client->request('GET', '/user/' . $user->getUsername());
+
+        $this->assertResponseIsSuccessful();
+    }
+
+    public function testVerifiedUserCanEditProfile(): void
+    {
+        $client = static::createClient();
         $user = $this->createUser();
         $client->loginUser($user);
 
@@ -50,28 +72,23 @@ class UserProfileControllerTest extends EntityBuilder
             ]
         ]);
 
-        $userProfile = $entityManager->getRepository(UserProfile::class)->findOneBy([
+        $userProfile = $this->repository->findOneBy([
             'phone_number' => $phoneNumber
         ]);
 
-
         $this->assertNotNull($userProfile);
-        $this->assertSame(302, $client->getResponse()->getStatusCode());
+        $this->assertResponseStatusCodeSame(302);
         $this->assertResponseRedirects('/user/' . $user->getUsername());
     }
 
-    public function testUserCanNotEditProfileIfPhoneNumberExists()
+    public function testUserCanNotEditProfileIfPhoneNumberExists(): void
     {
         $client = static::createClient();
-
         $phoneNumber = (string) random_int(111111111, 999999999);
         $this->createUser($phoneNumber);
 
-        $session = new Session(new MockArraySessionStorage());
-
         $user = $this->createUser();
         $client->loginUser($user);
-
 
         $client->request('POST', '/user/' . $user->getUsername() . '/edit', [
             'user_profile_form' => [
@@ -82,11 +99,14 @@ class UserProfileControllerTest extends EntityBuilder
             ]
         ]);
 
-        $this->assertNotNull($session->getFlashBag()->get('verify.phone_number.error'));
-        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        $this->assertNull($this->repository->findOneBy([
+            'id' => $user->getId(),
+            'phone_number' => $phoneNumber
+        ]));
+        $this->assertResponseStatusCodeSame(200);
     }
 
-    public function testUserCanDeleteHisProfile()
+    public function testUserCanDeleteHisProfile(): void
     {
         $client = static::createClient();
         $user = $this->createUser();
@@ -95,7 +115,23 @@ class UserProfileControllerTest extends EntityBuilder
         $client->request('GET', '/user/' . $user->getUsername() . '/delete');
 
         $this->assertNull($client->getRequest()->getUser());
-        $this->assertResponseStatusCodeSame(302, $client->getResponse()->getStatusCode());
+        $this->assertResponseStatusCodeSame(302);
         $this->assertResponseRedirects('/');
+        $this->assertNotEmpty($client->getRequest()->getSession()->getFlashBag()->get('success'));
+    }
+
+    public function testUserCanNotDeleteSomeoneElseProfile(): void
+    {
+        $client = static::createClient();
+        $user = $this->createUser();
+        $client->loginUser($user);
+
+        $someoneElse = $this->createUser();
+        $client->request('GET', '/user/' . $someoneElse->getUsername() . '/delete');
+
+        $this->assertNotNull($this->repository->findOneBy(['id' => $someoneElse->getUserProfile()->getId()]));
+        $this->assertResponseStatusCodeSame(302);
+        $this->assertResponseRedirects('/');
+        $this->assertNotEmpty($client->getRequest()->getSession()->getFlashBag()->get('error'));
     }
 }

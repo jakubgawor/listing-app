@@ -11,7 +11,6 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 abstract class EntityBuilder extends WebTestCase implements EntityBuilderInterface
 {
-
     public function createUser(string $phoneNumber = null, string $role = UserRoleEnum::ROLE_USER_EMAIL_VERIFIED, bool $isVerfified = true): User
     {
         $entityManager = self::getContainer()->get('doctrine')->getManager();
