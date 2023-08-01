@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} Admin {% endblock %}
+
+{% block body %}
+
+    Title: {{ listing.title }} <br>
+    Slug: {{ listing.slug }} <br>
+    Description: {{ listing.description }} <br>
+    Created by: {{ listing.belongsToUser.username }} <br>
+
+    <div class="text-xs">
+        Created at: {{ listing.createdAt|date("d-m-Y-H-i-s") }}
+    </div>
+
+
+
+{% endblock %}

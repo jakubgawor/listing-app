@@ -5,6 +5,7 @@ namespace App\Service\Listing;
 use App\Entity\Listing;
 use App\Entity\User;
 use App\Enum\ListingStatusEnum;
+use App\Enum\UserRoleEnum;
 use App\Exception\ListingNotFoundException;
 use App\Repository\ListingRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -15,7 +16,7 @@ class ListingService
     {
     }
 
-    public function find(string $slug, string $status = ListingStatusEnum::NOT_VERIFIED): Listing
+    public function find(string $slug, string $status): Listing
     {
         $listing = $this->listingRepository->findOneBySlugAndStatus($slug, $status);
 
@@ -28,7 +29,12 @@ class ListingService
 
     public function create(Listing $listing, User $user): void
     {
+        if (in_array(UserRoleEnum::ROLE_ADMIN, $user->getRoles())) {
+            $this->entityManager->persist($listing->setStatus(ListingStatusEnum::VERIFIED));
+        }
+
         $this->entityManager->persist($listing->setBelongsToUser($user));
+
         $this->entityManager->flush();
     }
 

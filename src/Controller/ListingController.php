@@ -30,14 +30,14 @@ class ListingController extends AbstractController
     public function index(): Response
     {
         return $this->render('listing/index.html.twig', [
-            'listings' => $this->listingRepository->findByStatus(ListingStatusEnum::NOT_VERIFIED) //todo admin
+            'listings' => $this->listingRepository->findByStatus(ListingStatusEnum::VERIFIED)
         ]);
     }
 
     #[Route('/listing/{slug}', name: 'app_show_listing')]
     public function showListing(string $slug): Response
     {
-        $listing = $this->listingService->find($slug);
+        $listing = $this->listingService->find($slug, ListingStatusEnum::VERIFIED);
 
         return $this->render('listing/showListing.html.twig', [
             'listing' => $listing
@@ -89,7 +89,7 @@ class ListingController extends AbstractController
 
     private function findAndAuthorize(string $slug): Listing
     {
-        $listing = $this->listingService->find($slug);
+        $listing = $this->listingService->find($slug, ListingStatusEnum::VERIFIED);
         $this->authorizationService->denyUnauthorizedUserAccess($listing->getBelongsToUser());
         return $listing;
     }
