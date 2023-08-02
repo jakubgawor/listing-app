@@ -2,7 +2,7 @@
 
 namespace App\Enum;
 
-enum UserRoleEnum
+final class UserRoleEnum
 {
     public const ROLE_USER = 'ROLE_USER';
     public const ROLE_USER_EMAIL_VERIFIED = 'ROLE_USER_EMAIL_VERIFIED';

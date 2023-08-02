@@ -11,29 +11,35 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 abstract class EntityBuilder extends WebTestCase implements EntityBuilderInterface
 {
-    public function createUser(string $phoneNumber = null, string $role = UserRoleEnum::ROLE_USER_EMAIL_VERIFIED, bool $isVerfified = true): User
+    public function createUser(array $data = []): User
     {
-        $entityManager = self::getContainer()->get('doctrine')->getManager();
         $passwordHasher = self::getContainer()->get(UserPasswordHasherInterface::class);
+        $entityManager = self::getContainer()->get('doctrine')->getManager();
         $uniqueId = uniqid();
 
-        $userEmail = 'login_test_' . $uniqueId . '@login_test.com';
-        $userUsername = 'login_test_' . $uniqueId;
-        $userPassword = 'test_password';
+        $userData = [
+            'email' => 'login_test_' . $uniqueId . '@login_test.com',
+            'username' => 'login_test_' . $uniqueId,
+            'phoneNumber' => null,
+            'password' => 'test_password',
+            'role' => UserRoleEnum::ROLE_USER_EMAIL_VERIFIED,
+            'isVerified' => true
+        ];
+
+        foreach ($userData as $key => $value) {
+            $userData[$key] = $data[$key] ?? $value;
+        }
 
         $user = new User;
         $user
-            ->setEmail($userEmail)
-            ->setUsername($userUsername)
-            ->setRoles([$role])
-            ->setIsVerified($isVerfified)
-            ->setPassword($passwordHasher->hashPassword($user, $userPassword));
+            ->setEmail($userData['email'])
+            ->setUsername($userData['username'])
+            ->setRoles([$userData['role']])
+            ->setIsVerified($userData['isVerified'])
+            ->setPassword($passwordHasher->hashPassword($user, $userData['password']))
+            ->setUserProfile((new UserProfile)->setUser($user)->setPhoneNumber($userData['phoneNumber']));
 
         $entityManager->persist($user);
-
-        $userProfile = (new UserProfile)->setUser($user)->setPhoneNumber($phoneNumber);
-        $entityManager->persist($userProfile);
-
         $entityManager->flush();
 
         return $user;
