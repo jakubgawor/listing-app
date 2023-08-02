@@ -33,7 +33,7 @@ class ListingControllerTest extends EntityBuilder
         $title = $this->faker->realText(15);
         $description = $this->faker->realText(20);
 
-        $this->createListing($title, $description, $author);
+        $this->createListing($title, $description, ListingStatusEnum::NOT_VERIFIED, $author);
 
         /** @var Listing $listing */
         $listing = $this->repository->findOneBy([
@@ -46,11 +46,11 @@ class ListingControllerTest extends EntityBuilder
         $this->assertSame(null, $listing->getEditedAt());
     }
 
-    public function testShowExistingListing(): void
+    public function testShowExistingVerifiedListing(): void
     {
         $client = static::createClient();
         $author = $this->createUser();
-        $listing = $this->createListing($this->faker->realText(15), $this->faker->realText(20), $author);
+        $listing = $this->createListing($this->faker->realText(15), $this->faker->realText(20), ListingStatusEnum::VERIFIED, $author);
 
         $client->request('GET', '/listing/' . $listing->getSlug());
 
@@ -163,7 +163,7 @@ class ListingControllerTest extends EntityBuilder
         $author = $this->createUser();
         $client->loginUser($author);
 
-        $listing = $this->createListing($this->faker->realText(15), $this->faker->realText(20), $author);
+        $listing = $this->createListing($this->faker->realText(15), $this->faker->realText(20), ListingStatusEnum::VERIFIED, $author);
 
         $oldSlug = $listing->getSlug();
 
@@ -201,7 +201,7 @@ class ListingControllerTest extends EntityBuilder
         $user = $this->createUser();
         $client->loginUser($user);
 
-        $listing = $this->createListing($this->faker->realText(15), $this->faker->realText(20), $this->createUser());
+        $listing = $this->createListing($this->faker->realText(15), $this->faker->realText(20), ListingStatusEnum::VERIFIED, $this->createUser());
 
         $client->request('GET', '/listing/' . $listing->getSlug() . '/edit');
 
@@ -216,7 +216,7 @@ class ListingControllerTest extends EntityBuilder
         $author = $this->createUser();
         $client->loginUser($author);
 
-        $listing = $this->createListing($this->faker->realText(15), $this->faker->realText(20), $author);
+        $listing = $this->createListing($this->faker->realText(15), $this->faker->realText(20), ListingStatusEnum::VERIFIED, $author);
 
         $client->request('GET', '/listing/' . $listing->getSlug() . '/delete');
 
@@ -231,7 +231,7 @@ class ListingControllerTest extends EntityBuilder
         $author = $this->createUser();
         $client->loginUser($author);
 
-        $listing = $this->createListing($this->faker->realText(15), $this->faker->realText(20), $this->createUser());
+        $listing = $this->createListing($this->faker->realText(15), $this->faker->realText(20), ListingStatusEnum::VERIFIED, $this->createUser());
 
         $client->request('GET', '/listing/' . $listing->getSlug() . '/delete');
 
@@ -247,7 +247,7 @@ class ListingControllerTest extends EntityBuilder
     {
         $client = static::createClient();
 
-        $listing = $this->createListing($this->faker->realText(20), $this->faker->realText(50), $this->createUser());
+        $listing = $this->createListing($this->faker->realText(20), $this->faker->realText(50), ListingStatusEnum::VERIFIED, $this->createUser());
 
         $client->request('GET', '/listing/' . $listing->getSlug() . '/delete');
 

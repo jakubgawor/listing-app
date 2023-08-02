@@ -39,7 +39,7 @@ abstract class EntityBuilder extends WebTestCase implements EntityBuilderInterfa
         return $user;
     }
 
-    public function createListing(string $title, string $description, User $user): Listing
+    public function createListing(string $title, string $description, string $status, User $user): Listing
     {
         $entityManager = self::getContainer()->get('doctrine')->getManager();
 
@@ -47,6 +47,7 @@ abstract class EntityBuilder extends WebTestCase implements EntityBuilderInterfa
         $listing
             ->setTitle($title)
             ->setDescription($description)
+            ->setStatus($status)
             ->setBelongsToUser($user);
 
         $entityManager->persist($listing);

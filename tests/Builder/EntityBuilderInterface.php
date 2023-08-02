@@ -9,5 +9,5 @@ interface EntityBuilderInterface
 {
     public function createUser(): User;
 
-    public function createListing(string $title, string $description, User $user): Listing;
+    public function createListing(string $title, string $description, string $status, User $user): Listing;
 }
