@@ -43,6 +43,15 @@ class ListingRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    public function findOneBySlug(string $slug)
+    {
+        return $this->createQueryBuilder('l')
+            ->where('l.slug = :slug')
+            ->setParameter('slug', $slug)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
 //    /**
 //     * @return Listing[] Returns an array of Listing objects
 //     */

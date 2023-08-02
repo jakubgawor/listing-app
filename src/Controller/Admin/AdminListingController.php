@@ -5,8 +5,8 @@ namespace App\Controller\Admin;
 use App\Enum\ListingStatusEnum;
 use App\Form\Handler\ListingFormHandler;
 use App\Repository\ListingRepository;
+use App\Service\AdminService;
 use App\Service\Listing\ListingService;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,8 +15,10 @@ use Symfony\Component\Routing\Annotation\Route;
 class AdminListingController extends AbstractController
 {
     public function __construct(
-        private readonly ListingRepository      $listingRepository,
-        private readonly EntityManagerInterface $entityManager
+        private readonly ListingRepository  $listingRepository,
+        private readonly ListingFormHandler $listingFormHandler,
+        private readonly ListingService     $listingService,
+        private readonly AdminService       $adminService
     )
     {
     }
@@ -33,47 +35,30 @@ class AdminListingController extends AbstractController
     public function showListing(string $slug): Response
     {
         return $this->render('admin/showListing.html.twig', [
-            'listing' => $this->listingRepository->findOneBy([
-                'slug' => $slug
-            ])
+            'listing' => $this->listingRepository->findOneBySlug($slug)
         ]);
     }
 
     #[Route('/admin/listing/{slug}/verify', name: 'app_admin_verify')]
     public function verify(string $slug): Response
     {
-        $listing = $this->listingRepository->findOneBy([
-            'slug' => $slug
-        ]);
-
-        if ($listing->getStatus() === ListingStatusEnum::VERIFIED) {
-            $this->addFlash('notification', 'This listing is already verified!');
-            return $this->redirectToRoute('app_show_listing', [
-                'slug' => $slug
-            ]);
-        }
-
-        $this->entityManager->persist($listing->setStatus(ListingStatusEnum::VERIFIED));
-        $this->entityManager->flush();
-
+        $listing = $this->adminService->verifyListing($this->listingRepository->findOneBySlug($slug));
 
         $this->addFlash('success', 'Successfully verified  listing!' . $listing->getStatus());
         return $this->redirectToRoute('app_show_listing', [
-            'slug' => $slug
+            'slug' => $listing->getSlug()
         ]);
     }
 
     #[Route('/admin/listing/{slug}/edit', name: 'app_admin_edit')]
-    public function edit(string $slug, Request $request, ListingFormHandler $listingFormHandler): Response
+    public function edit(string $slug, Request $request): Response
     {
-        $listing = $this->listingRepository->findOneBy([
-            'slug' => $slug
-        ]);
+        $listing = $this->listingRepository->findOneBySlug($slug);
 
-        $form = $listingFormHandler->handle($listing->getBelongsToUser(), $request, $listing);
+        $form = $this->listingFormHandler->handle($listing->getBelongsToUser(), $request, $listing);
 
         if ($form === true) {
-            $this->addFlash('success', 'Your listing has been updated!');
+            $this->addFlash('success', 'Listing has been updated!');
             return $this->redirectToRoute('app_index');
         }
 
@@ -83,13 +68,9 @@ class AdminListingController extends AbstractController
     }
 
     #[Route('/admin/listing/{slug}/delete', name: 'app_admin_delete')]
-    public function delete(string $slug, ListingService $listingService): Response
+    public function delete(string $slug): Response
     {
-        $listing = $this->listingRepository->findOneBy([
-            'slug' => $slug
-        ]);
-
-        $listingService->deleteListing($listing);
+        $this->listingService->deleteListing($this->listingRepository->findOneBySlug($slug));
 
         $this->addFlash('success', 'Listing has been deleted!');
         return $this->redirectToRoute('app_index');

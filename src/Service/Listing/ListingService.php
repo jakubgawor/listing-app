@@ -12,7 +12,10 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class ListingService
 {
-    public function __construct(private EntityManagerInterface $entityManager, private ListingRepository $listingRepository)
+    public function __construct(
+        private readonly EntityManagerInterface $entityManager,
+        private readonly ListingRepository      $listingRepository
+    )
     {
     }
 
@@ -43,4 +46,11 @@ class ListingService
         $this->entityManager->remove($listing);
         $this->entityManager->flush();
     }
+
+    public function verifyListing(Listing $listing): void
+    {
+        $this->entityManager->persist($listing->setStatus(ListingStatusEnum::VERIFIED));
+        $this->entityManager->flush();
+    }
+
 }
