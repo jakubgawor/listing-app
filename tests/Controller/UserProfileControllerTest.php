@@ -29,10 +29,9 @@ class UserProfileControllerTest extends EntityBuilder
         $client->request('GET', '/user/' . $user->getUsername());
 
         $this->assertNull($client->getRequest()->getUser());
-        $this->assertResponseStatusCodeSame(302);
-        $this->assertResponseRedirects('/login');
+        $this->assertResponseRedirects('/login', 302);
     }
-    
+
     public function testUserProfilePageCanBeRenderedIfTheUserIsLoggedInAndHasVerifiedEmail(): void
     {
         $client = static::createClient();
@@ -47,7 +46,10 @@ class UserProfileControllerTest extends EntityBuilder
     public function testUserProfilePageCanBeRenderedIfTheUserIsLoggedInAndHasNotVerifiedEmail(): void
     {
         $client = static::createClient();
-        $user = $this->createUser(null, UserRoleEnum::ROLE_USER, false);
+        $user = $this->createUser([
+            'role' => UserRoleEnum::ROLE_USER,
+            'isVerified' => false
+        ]);
         $client->loginUser($user);
 
         $client->request('GET', '/user/' . $user->getUsername());
@@ -77,15 +79,14 @@ class UserProfileControllerTest extends EntityBuilder
         ]);
 
         $this->assertNotNull($userProfile);
-        $this->assertResponseStatusCodeSame(302);
-        $this->assertResponseRedirects('/user/' . $user->getUsername());
+        $this->assertResponseRedirects('/user/' . $user->getUsername(), 302);
     }
 
     public function testUserCanNotEditProfileIfPhoneNumberExists(): void
     {
         $client = static::createClient();
         $phoneNumber = (string) random_int(111111111, 999999999);
-        $this->createUser($phoneNumber);
+        $this->createUser(['phoneNumber' => $phoneNumber]);
 
         $user = $this->createUser();
         $client->loginUser($user);
@@ -103,7 +104,8 @@ class UserProfileControllerTest extends EntityBuilder
             'id' => $user->getId(),
             'phone_number' => $phoneNumber
         ]));
-        $this->assertResponseStatusCodeSame(200);
+
+        $this->assertResponseIsSuccessful();
     }
 
     public function testUserCanDeleteHisProfile(): void
@@ -115,8 +117,7 @@ class UserProfileControllerTest extends EntityBuilder
         $client->request('GET', '/user/' . $user->getUsername() . '/delete');
 
         $this->assertNull($client->getRequest()->getUser());
-        $this->assertResponseStatusCodeSame(302);
-        $this->assertResponseRedirects('/');
+        $this->assertResponseRedirects('/', 302);
         $this->assertNotEmpty($client->getRequest()->getSession()->getFlashBag()->get('success'));
     }
 
@@ -130,8 +131,7 @@ class UserProfileControllerTest extends EntityBuilder
         $client->request('GET', '/user/' . $someoneElse->getUsername() . '/delete');
 
         $this->assertNotNull($this->repository->findOneBy(['id' => $someoneElse->getUserProfile()->getId()]));
-        $this->assertResponseStatusCodeSame(302);
-        $this->assertResponseRedirects('/');
+        $this->assertResponseRedirects('/', 302);
         $this->assertNotEmpty($client->getRequest()->getSession()->getFlashBag()->get('error'));
     }
 }
