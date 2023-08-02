@@ -8,7 +8,7 @@ use App\Tests\Builder\EntityBuilder;
 use Faker\Factory;
 use Faker\Generator;
 
-class RenderTest extends EntityBuilder
+class AccessTest extends EntityBuilder
 {
     private Generator $faker;
 
@@ -83,8 +83,7 @@ class RenderTest extends EntityBuilder
 
         $client->request('GET', '/create-listing');
 
-        $this->assertResponseStatusCodeSame(302);
-        $this->assertResponseRedirects('/login');
+        $this->assertResponseRedirects('/login', 302);
     }
 
     public function testEditListingPageCanBeRenderedIfTheUserIsVerifiedAndIsOwnerOfTheVerifiedListing(): void
