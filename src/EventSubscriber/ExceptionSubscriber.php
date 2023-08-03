@@ -16,13 +16,18 @@ class ExceptionSubscriber implements EventSubscriberInterface
     {
         $exception = $event->getThrowable();
 
-        if($exception instanceof ListingNotFoundException || $exception instanceof UnauthorizedAccessException) {
-            $this->handleException($event, $exception, 'error', '/');
+        $exceptionClassMap = [
+            ListingNotFoundException::class => ['flashType' => 'error', 'path' => '/'],
+            UnauthorizedAccessException::class => ['flashType' => 'error', 'path' => '/'],
+            RepeatedVerificationException::class => ['flashType' => 'notification', 'path' => '/'],
+        ];
+
+        foreach ($exceptionClassMap as $exceptionClass => $details) {
+            if($exception instanceof $exceptionClass) {
+                $this->handleException($event, $exception, $details['flashType'], $details['path']);
+            }
         }
 
-        if($exception instanceof RepeatedVerificationException) {
-            $this->handleException($event, $exception, 'notification', '/');
-        }
     }
 
     public static function getSubscribedEvents(): array
@@ -32,7 +37,7 @@ class ExceptionSubscriber implements EventSubscriberInterface
         ];
     }
 
-    private function handleException(ExceptionEvent $event, \Exception $exception, string $flashType, string $redirectPath): void
+    private function handleException(ExceptionEvent $event, \Throwable $exception, string $flashType, string $redirectPath): void
     {
         $event->getRequest()->getSession()->getFlashBag()->add($flashType, $exception->getMessage());
         $event->setResponse(new RedirectResponse($redirectPath));
