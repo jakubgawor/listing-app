@@ -17,17 +17,11 @@ class ExceptionSubscriber implements EventSubscriberInterface
         $exception = $event->getThrowable();
 
         if($exception instanceof ListingNotFoundException || $exception instanceof UnauthorizedAccessException) {
-            $event->getRequest()->getSession()->getFlashBag()->add('error', $exception->getMessage());
-
-            $response = new RedirectResponse('/');
-            $event->setResponse($response);
+            $this->handleException($event, $exception, 'error', '/');
         }
 
         if($exception instanceof RepeatedVerificationException) {
-            $event->getRequest()->getSession()->getFlashBag()->add('notification', $exception->getMessage());
-
-            $response = new RedirectResponse('/');
-            $event->setResponse($response);
+            $this->handleException($event, $exception, 'notification', '/');
         }
     }
 
@@ -38,5 +32,9 @@ class ExceptionSubscriber implements EventSubscriberInterface
         ];
     }
 
-
+    private function handleException(ExceptionEvent $event, \Exception $exception, string $flashType, string $redirectPath): void
+    {
+        $event->getRequest()->getSession()->getFlashBag()->add($flashType, $exception->getMessage());
+        $event->setResponse(new RedirectResponse($redirectPath));
+    }
 }
