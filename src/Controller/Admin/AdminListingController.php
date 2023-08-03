@@ -27,7 +27,7 @@ class AdminListingController extends AbstractController
     public function showListings(): Response
     {
         return $this->render('admin/listings.html.twig', [
-            'listings' => $this->listingRepository->findByStatus(ListingStatusEnum::NOT_VERIFIED)
+            'listings' => $this->listingRepository->findNotVerified()
         ]);
     }
 

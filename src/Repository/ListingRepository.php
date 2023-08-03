@@ -22,22 +22,32 @@ class ListingRepository extends ServiceEntityRepository
         parent::__construct($registry, Listing::class);
     }
 
-    public function findOneBySlugAndStatus(string $slug, string $status)
+    public function findVerifiedBySlug($slug)
     {
         return $this->createQueryBuilder('l')
             ->where('l.slug = :slug')
             ->andWhere('l.status = :status')
             ->setParameter('slug', $slug)
-            ->setParameter('status', $status)
+            ->setParameter('status', ListingStatusEnum::VERIFIED)
             ->getQuery()
             ->getOneOrNullResult();
     }
 
-    public function findByStatus(string $status)
+    public function findVerified()
     {
         return $this->createQueryBuilder('l')
             ->where('l.status = :status')
-            ->setParameter('status', $status)
+            ->setParameter('status', ListingStatusEnum::VERIFIED)
+            ->orderBy('l.created_at', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findNotVerified()
+    {
+        return $this->createQueryBuilder('l')
+            ->where('l.status = :status')
+            ->setParameter('status', ListingStatusEnum::NOT_VERIFIED)
             ->orderBy('l.created_at', 'DESC')
             ->getQuery()
             ->getResult();

@@ -8,6 +8,7 @@ use App\Enum\ListingStatusEnum;
 use App\Enum\UserRoleEnum;
 use App\Exception\ListingNotFoundException;
 use App\Repository\ListingRepository;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 
 class ListingService
@@ -19,9 +20,9 @@ class ListingService
     {
     }
 
-    public function find(string $slug, string $status): Listing
+    public function find(string $slug): Listing
     {
-        $listing = $this->listingRepository->findOneBySlugAndStatus($slug, $status);
+        $listing = $this->listingRepository->findVerifiedBySlug($slug);
 
         if ($listing === null) {
             throw new ListingNotFoundException('Listing not found', 404);
@@ -37,6 +38,17 @@ class ListingService
         }
 
         $this->entityManager->persist($listing->setBelongsToUser($user));
+
+        $this->entityManager->flush();
+    }
+
+    public function edit(Listing $listing, User $user): void
+    {
+        if (!in_array(UserRoleEnum::ROLE_ADMIN, $user->getRoles())) {
+            $this->entityManager->persist($listing->setStatus(ListingStatusEnum::NOT_VERIFIED));
+        }
+
+        $this->entityManager->persist($listing->setEditedAt(new DateTime));
 
         $this->entityManager->flush();
     }

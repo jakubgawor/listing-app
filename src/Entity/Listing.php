@@ -52,7 +52,6 @@ class Listing
     public function setUpdatedValues()
     {
         $this->slug = $this->createSlug($this->title);
-        $this->edited_at = new \DateTime();
     }
 
 
@@ -153,4 +152,5 @@ class Listing
 
         return $slug . '_' . uniqid();
     }
+
 }
