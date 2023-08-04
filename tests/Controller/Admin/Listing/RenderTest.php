@@ -36,6 +36,13 @@ class RenderTest extends EntityBuilder
         $this->assertResponseIsSuccessful();
     }
 
+    public function testEditNotVerifiedListingPageCanBeRenderedByAdmin(): void
+    {
+        $this->sendRequest(ListingStatusEnum::NOT_VERIFIED, '/edit');
+
+        $this->assertResponseIsSuccessful();
+    }
+
     private function sendRequest(string $listingStatus, ?string $additionalUri = null): void
     {
         static::createClient()

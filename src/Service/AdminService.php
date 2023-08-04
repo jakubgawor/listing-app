@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Entity\Listing;
 use App\Enum\ListingStatusEnum;
+use App\Exception\ListingNotFoundException;
 use App\Exception\RepeatedVerificationException;
 use App\Service\Listing\ListingService;
 
@@ -15,8 +16,12 @@ class AdminService
     {
     }
 
-    public function verifyListing(Listing $listing): Listing
+    public function verifyListing(?Listing $listing): Listing
     {
+        if (!$listing) {
+            throw new ListingNotFoundException('Listing not found');
+        }
+
         if ($listing->getStatus() === ListingStatusEnum::VERIFIED) {
             throw new RepeatedVerificationException('This listing is already verified!');
         }

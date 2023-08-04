@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Enum\ListingStatusEnum;
 use App\Repository\ListingRepository;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 
@@ -41,7 +42,7 @@ class Listing
 
 
     #[ORM\PrePersist]
-    public function setInitialValues()
+    public function setInitialValues(): void
     {
         $this->slug = $this->createSlug($this->title);
         $this->created_at = new \DateTime();
@@ -49,9 +50,13 @@ class Listing
     }
 
     #[ORM\PreUpdate]
-    public function setUpdatedValues()
+    public function setUpdatedValues(PreUpdateEventArgs $args): void
     {
-        $this->slug = $this->createSlug($this->title);
+        $changes = $args->getEntityChangeSet();
+
+        if(isset($changes['title'])) {
+            $this->slug = $this->createSlug($this->title);
+        }
     }
 
 
