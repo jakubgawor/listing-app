@@ -2,7 +2,6 @@
 
 namespace App\Controller\Admin;
 
-use App\Enum\ListingStatusEnum;
 use App\Form\Handler\ListingFormHandler;
 use App\Repository\ListingRepository;
 use App\Service\AdminService;

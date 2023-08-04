@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\Listing;
-use App\Enum\ListingStatusEnum;
 use App\Enum\UserRoleEnum;
 use App\Form\Handler\ListingFormHandler;
 use App\Repository\ListingRepository;
