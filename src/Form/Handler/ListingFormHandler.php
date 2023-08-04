@@ -16,7 +16,7 @@ class ListingFormHandler
     {
     }
 
-    public function handle(User $user, Request $request, Listing $listing = new Listing): bool|FormInterface
+    public function handle(User $user, Request $request, Listing $listing = new Listing, ?User $admin = null): bool|FormInterface
     {
         $form = $this->formFactory->create(ListingFormType::class, $listing);
         $form->handleRequest($request);
@@ -27,7 +27,7 @@ class ListingFormHandler
             if($listing->getBelongsToUser() === null) {
                 $this->listingService->create($listing, $user);
             } else {
-                $this->listingService->edit($listing, $user);
+                $this->listingService->edit($listing, $user, $admin);
             }
 
             return true;

@@ -42,10 +42,14 @@ class ListingService
         $this->entityManager->flush();
     }
 
-    public function edit(Listing $listing, User $user): void
+    public function edit(Listing $listing, User $user, ?User $admin = null): void
     {
-        if (!in_array(UserRoleEnum::ROLE_ADMIN, $user->getRoles())) {
+        if (!in_array(UserRoleEnum::ROLE_ADMIN, $user->getRoles()) ) {
             $this->entityManager->persist($listing->setStatus(ListingStatusEnum::NOT_VERIFIED));
+        }
+
+        if ($admin) {
+            $this->entityManager->persist($listing->setStatus(ListingStatusEnum::VERIFIED));
         }
 
         $this->entityManager->persist($listing->setEditedAt(new DateTime));

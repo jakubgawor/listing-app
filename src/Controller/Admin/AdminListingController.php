@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Exception\ListingNotFoundException;
 use App\Form\Handler\ListingFormHandler;
 use App\Repository\ListingRepository;
 use App\Service\AdminService;
@@ -54,7 +55,11 @@ class AdminListingController extends AbstractController
     {
         $listing = $this->listingRepository->findOneBySlug($slug);
 
-        $form = $this->listingFormHandler->handle($listing->getBelongsToUser(), $request, $listing);
+        if ($listing === null) {
+            throw new ListingNotFoundException('Listing not found', 404);
+        }
+
+        $form = $this->listingFormHandler->handle($listing->getBelongsToUser(), $request, $listing, $this->getUser());
 
         if ($form === true) {
             $this->addFlash('success', 'Listing has been updated!');
