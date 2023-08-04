@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Listing;
 use App\Exception\ListingNotFoundException;
 use App\Form\Handler\ListingFormHandler;
 use App\Repository\ListingRepository;
@@ -53,11 +54,7 @@ class AdminListingController extends AbstractController
     #[Route('/admin/listing/{slug}/edit', name: 'app_admin_edit')]
     public function edit(string $slug, Request $request): Response
     {
-        $listing = $this->listingRepository->findOneBySlug($slug);
-
-        if ($listing === null) {
-            throw new ListingNotFoundException('Listing not found', 404);
-        }
+        $listing = $this->findListing($slug);
 
         $form = $this->listingFormHandler->handle($listing->getBelongsToUser(), $request, $listing, $this->getUser());
 
@@ -74,10 +71,23 @@ class AdminListingController extends AbstractController
     #[Route('/admin/listing/{slug}/delete', name: 'app_admin_delete')]
     public function delete(string $slug): Response
     {
-        $this->listingService->deleteListing($this->listingRepository->findOneBySlug($slug));
+        $this->listingService->deleteListing($this->findListing($slug));
 
         $this->addFlash('success', 'Listing has been deleted!');
         return $this->redirectToRoute('app_index');
     }
 
+    /**
+     * @throws ListingNotFoundException
+     */
+    private function findListing(string $slug): Listing
+    {
+        $listing = $this->listingRepository->findOneBySlug($slug);
+
+        if ($listing === null) {
+            throw new ListingNotFoundException('Listing not found', 404);
+        }
+
+        return $listing;
+    }
 }
