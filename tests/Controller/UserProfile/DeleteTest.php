@@ -3,6 +3,7 @@
 namespace App\Tests\Controller\UserProfile;
 
 use App\Entity\UserProfile;
+use App\Enum\UserRoleEnum;
 use App\Tests\Builder\EntityBuilder;
 use Doctrine\ORM\EntityRepository;
 
@@ -42,5 +43,18 @@ class DeleteTest extends EntityBuilder
         $this->assertNotNull($this->repository->findOneBy(['id' => $someoneElse->getUserProfile()->getId()]));
         $this->assertResponseRedirects('/', 302);
         $this->assertNotEmpty($client->getRequest()->getSession()->getFlashBag()->get('error'));
+    }
+
+    public function testAdminCanNotDeleteHisProfile(): void
+    {
+        $client = static::createClient();
+        $user = $this->createUser(['role' => UserRoleEnum::ROLE_ADMIN]);
+        $client->loginUser($user);
+
+        $client->request('GET', '/user/' . $user->getUsername() . '/delete');
+
+        $this->assertResponseRedirects('/', 302);
+        $this->assertNotEmpty($client->getRequest()->getSession()->getFlashBag()->get('error'));
+        $this->assertNotNull($this->repository->findOneBy(['id' => $user->getUserProfile()->getId()]));
     }
 }
