@@ -2,9 +2,11 @@
 
 namespace App\Tests\Controller\UserProfile;
 
+use App\Entity\User;
 use App\Entity\UserProfile;
 use App\Tests\Builder\EntityBuilder;
 use Doctrine\ORM\EntityRepository;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
 class EditTest extends EntityBuilder
 {
@@ -22,23 +24,11 @@ class EditTest extends EntityBuilder
         $client = static::createClient();
         $user = $this->createUser();
         $client->loginUser($user);
-
         $phoneNumber = random_int(111111111, 999999999);
 
-        $client->request('POST', '/user/' . $user->getUsername() . '/edit', [
-            'user_profile_form' => [
-                'first_name' => 'testName',
-                'last_name' => 'testLastName',
-                'phone_number' => $phoneNumber,
-                'city' => 'testCity'
-            ]
-        ]);
+        $this->editUserProfile($client, $user, $phoneNumber);
 
-        $userProfile = $this->repository->findOneBy([
-            'phone_number' => $phoneNumber
-        ]);
-
-        $this->assertNotNull($userProfile);
+        $this->assertNotNull($this->repository->findOneBy(['phone_number' => $phoneNumber]));
         $this->assertResponseRedirects('/user/' . $user->getUsername(), 302);
     }
 
@@ -51,19 +41,24 @@ class EditTest extends EntityBuilder
         $user = $this->createUser();
         $client->loginUser($user);
 
-        $client->request('POST', '/user/' . $user->getUsername() . '/edit', [
-            'user_profile_form' => [
-                'first_name' => 'testName',
-                'last_name' => 'testLastName',
-                'phone_number' => $phoneNumber,
-                'city' => 'testCity'
-            ]
-        ]);
+        $this->editUserProfile($client, $user, $phoneNumber);
 
         $this->assertNull($this->repository->findOneBy([
             'id' => $user->getUserProfile()->getId(),
             'phone_number' => $phoneNumber
         ]));
+    }
+
+    private function editUserProfile(KernelBrowser $client, User $user, string $phoneNumber): void
+    {
+        $crawler = $client->request('GET', '/user/' . $user->getUsername() . '/edit');
+        $form = $crawler->selectButton('Update profile')->form([
+            'user_profile_form[first_name]' => 'testName',
+            'user_profile_form[last_name]' => 'testLastName',
+            'user_profile_form[phone_number]' => $phoneNumber,
+            'user_profile_form[city]' => 'testCity'
+        ]);
+        $client->submit($form);
     }
 
 }
