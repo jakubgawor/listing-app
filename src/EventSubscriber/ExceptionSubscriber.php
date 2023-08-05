@@ -2,7 +2,9 @@
 
 namespace App\EventSubscriber;
 
+use App\Exception\AdminDegradationException;
 use App\Exception\AdminDeletionException;
+use App\Exception\AdminPromotionException;
 use App\Exception\ListingNotFoundException;
 use App\Exception\RepeatedVerificationException;
 use App\Exception\UnauthorizedAccessException;
@@ -21,7 +23,9 @@ class ExceptionSubscriber implements EventSubscriberInterface
             ListingNotFoundException::class => ['flashType' => 'error', 'path' => '/'],
             UnauthorizedAccessException::class => ['flashType' => 'error', 'path' => '/'],
             RepeatedVerificationException::class => ['flashType' => 'notification', 'path' => '/'],
-            AdminDeletionException::class => ['flashType' => 'error', 'path' => '/']
+            AdminDeletionException::class => ['flashType' => 'error', 'path' => '/'],
+            AdminPromotionException::class => ['flashType' => 'notification', 'path' => '/'],
+            AdminDegradationException::class => ['flashType' => 'notification', 'path' => '/']
         ];
 
         foreach ($exceptionClassMap as $exceptionClass => $details) {
