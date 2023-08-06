@@ -54,6 +54,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'belongs_to_user', targetEntity: Listing::class, orphanRemoval: true)]
     private Collection $listings;
 
+    #[ORM\Column]
+    private ?bool $isBanned = false;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -203,6 +206,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $listing->setBelongsToUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function isBanned(): ?bool
+    {
+        return $this->isBanned;
+    }
+
+    public function setIsBanned(bool $isBanned): static
+    {
+        $this->isBanned = $isBanned;
 
         return $this;
     }

@@ -2,21 +2,11 @@
 
 namespace App\Tests\Controller\Admin\User;
 
-use App\Entity\User;
 use App\Enum\UserRoleEnum;
 use App\Tests\Builder\EntityBuilder;
-use Doctrine\ORM\EntityRepository;
 
 class DegradationTest extends EntityBuilder
 {
-    private EntityRepository $repository;
-
-    public function setUp(): void
-    {
-        $this->repository = static::getContainer()->get('doctrine')->getManager()->getRepository(User::class);
-
-        self::ensureKernelShutdown();
-    }
 
     public function testAdminCanDegradeOtherAdmin(): void
     {

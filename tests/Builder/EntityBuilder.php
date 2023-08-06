@@ -23,7 +23,8 @@ abstract class EntityBuilder extends WebTestCase implements EntityBuilderInterfa
             'phoneNumber' => null,
             'password' => 'test_password',
             'role' => UserRoleEnum::ROLE_USER_EMAIL_VERIFIED,
-            'isVerified' => true
+            'isVerified' => true,
+            'isBanned' => false,
         ];
 
         foreach ($userData as $key => $value) {
@@ -37,6 +38,7 @@ abstract class EntityBuilder extends WebTestCase implements EntityBuilderInterfa
             ->setRoles([$userData['role']])
             ->setIsVerified($userData['isVerified'])
             ->setPassword($passwordHasher->hashPassword($user, $userData['password']))
+            ->setIsBanned($userData['isBanned'])
             ->setUserProfile((new UserProfile)->setUser($user)->setPhoneNumber($userData['phoneNumber']));
 
         $entityManager->persist($user);

@@ -5,8 +5,10 @@ namespace App\Controller\Admin;
 use App\Entity\User;
 use App\Enum\UserRoleEnum;
 use App\Exception\AdminDegradationException;
+use App\Exception\BanUserException;
 use App\Service\AdminService;
 use App\Service\User\UserService;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -51,7 +53,34 @@ class AdminUserController extends AbstractController
         return $this->redirectToRoute('app_index');
     }
 
-// todo
-// ban user
-// unban user
+    #[Route('/admin/user/{username}/ban', name: 'app_admin_ban')]
+    public function banUser(User $user, EntityManagerInterface $entityManager): Response
+    {
+        if ($user->isBanned() === true) {
+            throw new BanUserException('User is already banned!');
+        }
+
+        if (in_array(UserRoleEnum::ROLE_ADMIN, $user->getRoles())) {
+            throw new BanUserException('You can not ban users with admin roles!');
+        }
+
+        foreach ($user->getListings() as $listing) {
+            $entityManager->remove($listing);
+        }
+
+        $entityManager->persist($user->setIsBanned(true));
+        $entityManager->flush();
+
+        return $this->redirectToRoute('app_index');
+    }
+
+    #[Route('/admin/user/{username}/ban', name: 'app_admin_unban')]
+    public function unbanUser(): Response
+    {
+        // check if the user is banned
+        // set $user ban value to false
+
+        return $this->redirectToRoute('app_index');
+    }
+
 }
