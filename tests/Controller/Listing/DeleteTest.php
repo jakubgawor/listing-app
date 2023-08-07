@@ -32,9 +32,7 @@ class DeleteTest extends EntityBuilder
 
         $client->request('GET', '/listing/' . $listing->getSlug() . '/delete');
 
-        $this->assertResponseRedirects('/', 302);
-        $this->assertNotEmpty($client->getRequest()->getSession()->getFlashBag()->get('success'));
-        $this->assertNull($listing->getId());
+        $this->assertNull($this->repository->findOneBy(['id' => $listing->getId()]));
     }
 
     public function testUserCanNotDeleteNotVerifiedListing(): void
@@ -47,8 +45,7 @@ class DeleteTest extends EntityBuilder
 
         $client->request('GET', '/listing/' . $listing->getSlug() . '/delete');
 
-        $this->assertResponseRedirects('/', 302);
-        $this->assertNotEmpty($client->getRequest()->getSession()->getFlashBag()->get('notification'));
+        $this->assertNotNull($this->repository->findOneBy(['id' => $listing->getId()]));
     }
 
     public function testUserCanNotDeleteSomeoneElseListing(): void
@@ -61,11 +58,7 @@ class DeleteTest extends EntityBuilder
 
         $client->request('GET', '/listing/' . $listing->getSlug() . '/delete');
 
-        $this->assertResponseRedirects('/', 302);
-        $this->assertNotEmpty($client->getRequest()->getSession()->getFlashBag()->get('error'));
-        $this->assertNotNull($this->repository->findOneBy([
-            'slug' => $listing->getSlug()
-        ]));
+        $this->assertNotNull($this->repository->findOneBy(['id' => $listing->getId()]));
     }
 
     public function testNotLoggedUserCanNotDeleteListings(): void
@@ -77,9 +70,7 @@ class DeleteTest extends EntityBuilder
         $client->request('GET', '/listing/' . $listing->getSlug() . '/delete');
 
         $this->assertResponseRedirects('/login', 302);
-        $this->assertNotNull($this->repository->findOneBy([
-            'slug' => $listing->getSlug()
-        ]));
+        $this->assertNotNull($this->repository->findOneBy(['id' => $listing->getId()]));
     }
 
     public function testUserCanNotDeleteNotExistingListing(): void
@@ -88,9 +79,9 @@ class DeleteTest extends EntityBuilder
         $user = $this->createUser();
         $client->loginUser($user);
 
-        $client->request('GET', '/listing/not-exist/delete');
+        $client->request('GET', '/listing/not-existing/delete');
 
         $this->assertResponseRedirects('/', 302);
-        $this->assertNotEmpty($client->getRequest()->getSession()->getFlashBag()->get('error'));
+        $this->assertSame(['Object not found'], $client->getRequest()->getSession()->getFlashBag()->get('error'));
     }
 }

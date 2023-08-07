@@ -39,7 +39,6 @@ class AccessTest extends EntityBuilder
         $client->request('GET', '/listing/' . $listing->getSlug());
 
         $this->assertResponseRedirects('/', 302);
-        $this->assertNotEmpty($client->getRequest()->getSession()->getFlashBag()->get('notification'));
     }
 
     public function testDoNotRenderNotExistingListing(): void
@@ -49,41 +48,45 @@ class AccessTest extends EntityBuilder
         $client->request('GET', '/listing/not-existing');
 
         $this->assertResponseRedirects('/', 302);
-        $this->assertNotEmpty($client->getRequest()->getSession()->getFlashBag()->get('error'));
+        $this->assertSame(['Object not found'], $client->getRequest()->getSession()->getFlashBag()->get('error'));
     }
 
     public function testCreateListingPageCanBeRenderedWhileUserIsVerifiedAndLoggedIn(): void
     {
-        $client = static::createClient();
-        $user = $this->createUser();
-        $client->loginUser($user);
-
-        $client->request('GET', '/create-listing');
+        static::createClient()
+            ->loginUser($this->createUser())
+            ->request('GET', '/create-listing');
 
         $this->assertResponseIsSuccessful();
     }
 
     public function testCreateListingPageCanNotBeRenderedWhileUserHasNotVerifiedEmailAddress(): void
     {
-        $client = static::createClient();
-        $user = $this->createUser([
-            'role' => UserRoleEnum::ROLE_USER,
-            'isVerified' => false
-        ]);
-        $client->loginUser($user);
-
-        $client->request('GET', '/create-listing');
+        static::createClient()
+            ->loginUser($this->createUser([
+                'role' => UserRoleEnum::ROLE_USER,
+                'isVerified' => false
+            ]))
+            ->request('GET', '/create-listing');
 
         $this->assertResponseStatusCodeSame(403);
     }
 
     public function testCreateListingPageCanNotBeRenderedWhileUserIsNotLoggedIn(): void
     {
-        $client = static::createClient();
-
-        $client->request('GET', '/create-listing');
+        static::createClient()
+            ->request('GET', '/create-listing');
 
         $this->assertResponseRedirects('/login', 302);
+    }
+
+    public function testCreateListingPageCanNotBeRenderedWhileUserIsBanned(): void
+    {
+        static::createClient()
+            ->loginUser($this->createUser(['isBanned' => true]))
+            ->request('GET', '/create-listing');
+
+        $this->assertResponseRedirects('/', 302);
     }
 
     public function testEditListingPageCanBeRenderedIfTheUserIsVerifiedAndIsOwnerOfTheVerifiedListing(): void
@@ -108,7 +111,6 @@ class AccessTest extends EntityBuilder
         $client->request('GET', '/listing/' . $listing->getSlug() . '/edit');
 
         $this->assertResponseRedirects('/', 302);
-        $this->assertNotEmpty($client->getRequest()->getSession()->getFlashBag()->get('notification'));
     }
 
     public function testEditListingPageCanNotBeRenderedIfTheUserIsNotTheOwnerOfTheListing(): void
@@ -121,7 +123,6 @@ class AccessTest extends EntityBuilder
         $client->request('GET', '/listing/' . $listing->getSlug() . '/edit');
 
         $this->assertResponseRedirects('/', 302);
-        $this->assertNotEmpty($client->getRequest()->getSession()->getFlashBag()->get('error'));
     }
 
     public function testEditListingPageCanNotBeRenderedIfTheUserIsNotVerified(): void
@@ -147,6 +148,15 @@ class AccessTest extends EntityBuilder
         $client->request('GET', '/listing/' . $listing->getSlug() . '/edit');
 
         $this->assertResponseRedirects('/login', 302);
+    }
+
+    public function testEditListingPageCanNotBeRenderedIfListingDoesNotExists(): void
+    {
+        $client = static::createClient()->loginUser($this->createUser());
+        $client->request('GET', '/listing/not-existing/edit');
+
+        $this->assertResponseRedirects('/', 302);
+        $this->assertSame(['Object not found'], $client->getRequest()->getSession()->getFlashBag()->get('error'));
     }
 
 }

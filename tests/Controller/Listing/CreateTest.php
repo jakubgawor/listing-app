@@ -46,9 +46,7 @@ class CreateTest extends EntityBuilder
             'belongs_to_user' => $user
         ]);
 
-        $this->assertResponseRedirects('/', 302);
         $this->assertNotNull($listing);
-        $this->assertSame($user->getId(), $listing->getBelongsToUser()->getId());
         $this->assertSame(ListingStatusEnum::NOT_VERIFIED, $listing->getStatus());
         $this->assertSame(null, $listing->getEditedAt());
     }

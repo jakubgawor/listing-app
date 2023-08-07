@@ -42,7 +42,6 @@ class RegistrationControllerTest extends EntityBuilder
             true
         );
 
-        $this->assertResponseRedirects('/', 302);
         $this->assertNotNull($this->repository->findOneBy(['username' => 'username' . $uniqueId]));
     }
 

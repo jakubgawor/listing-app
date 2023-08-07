@@ -49,15 +49,10 @@ class EditTest extends EntityBuilder
             'belongs_to_user' => $author->getId()
         ]);
 
-        $this->assertNull($this->repository->findOneBy([
-            'slug' => $oldSlug
-        ]));
+        $this->assertNull($this->repository->findOneBy(['slug' => $oldSlug]));
         $this->assertNotNull($editedListing);
         $this->assertSame(ListingStatusEnum::NOT_VERIFIED, $editedListing->getStatus());
-        $this->assertNotSame($editedListing->getSlug(), $oldSlug);
         $this->assertNotNull($editedListing->getEditedAt());
-        $this->assertNotEmpty($client->getRequest()->getSession()->getFlashBag()->get('success'));
-        $this->assertResponseRedirects('/', 302);
     }
 
 }

@@ -26,7 +26,6 @@ class DeleteTest extends EntityBuilder
         $client->request('GET', '/admin/user/' . $user->getUsername() . '/delete');
 
         $this->assertNull($this->repository->findOneBy(['id' => $user->getId()]));
-        $this->assertResponseRedirects('/', 302);
     }
 
     public function testAdminUserCanNotDeleteHisAccount(): void
@@ -37,7 +36,6 @@ class DeleteTest extends EntityBuilder
         $client->loginUser($admin)->request('GET', '/admin/user/' . $admin->getUsername() . '/delete');
 
         $this->assertNotNull($this->repository->findOneBy(['id' => $admin->getId()]));
-        $this->assertResponseRedirects('/', 302);
     }
 
     public function testAdminCanNotDeleteOtherAdminAccount(): void
@@ -50,15 +48,14 @@ class DeleteTest extends EntityBuilder
             ->request('GET', '/admin/user/' . $otherAdmin->getUsername() . '/delete');
 
         $this->assertNotNull($this->repository->findOneBy(['id' => $otherAdmin->getId()]));
-        $this->assertResponseRedirects('/', 302);
     }
 
     public function testAdminCanNotDeleteNotExistingUserAccount(): void
     {
-        static::createClient()
-            ->loginUser($this->createUser(['role' => UserRoleEnum::ROLE_ADMIN]))
-            ->request('GET', '/admin/user/not-existing/delete');
+        $client = static::createClient()->loginUser($this->createUser(['role' => UserRoleEnum::ROLE_ADMIN]));
 
-        $this->assertResponseRedirects('/', 302);
+        $client->request('GET', '/admin/user/not-existing/delete');
+
+        $this->assertSame(['Object not found'], $client->getRequest()->getSession()->getFlashBag()->get('error'));
     }
 }

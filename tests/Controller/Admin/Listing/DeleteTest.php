@@ -26,7 +26,7 @@ class DeleteTest extends EntityBuilder
         self::ensureKernelShutdown();
     }
 
-    public function testAdminCanDeleteSomeoneListing(): void
+    public function testAdminCanDeleteSomeoneElseListing(): void
     {
         $listing = $this->createListing(
             $this->faker->realText(10),
@@ -37,9 +37,7 @@ class DeleteTest extends EntityBuilder
 
         $this->client->request('GET', '/admin/listing/' . $listing->getSlug() . '/delete');
 
-        $this->assertResponseRedirects('/', 302);
         $this->assertNull($this->repository->findOneBy(['slug' => $listing->getSlug()]));
-
     }
 
     public function testAdminCanNotDeleteNotExistingListing(): void
@@ -48,7 +46,6 @@ class DeleteTest extends EntityBuilder
 
         $client->request('GET', '/admin/listing/not-existing/delete');
 
-        $this->assertResponseRedirects('/', 302);
-        $this->assertNotEmpty($client->getRequest()->getSession()->getFlashBag()->get('error'));
+        $this->assertSame(['Object not found'], $client->getRequest()->getSession()->getFlashBag()->get('error'));
     }
 }

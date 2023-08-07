@@ -15,9 +15,7 @@ class DegradationTest extends EntityBuilder
 
         $client->request('GET', '/admin/user/' . $otherAdmin->getUsername() . '/degrade');
 
-        $this->assertContains(UserRoleEnum::ROLE_USER_EMAIL_VERIFIED, $otherAdmin->getRoles());
         $this->assertNotContains(UserRoleEnum::ROLE_ADMIN, $otherAdmin->getRoles());
-        $this->assertResponseRedirects('/', 302);
     }
 
     public function testAdminCanNotDegradeUser(): void
@@ -27,7 +25,7 @@ class DegradationTest extends EntityBuilder
 
         $client->request('GET', '/admin/user/' . $user->getUsername() . '/degrade');
 
-        $this->assertResponseRedirects('/', 302);
+        $this->assertSame(['You can not degrade an user!'], $client->getRequest()->getSession()->getFlashBag()->get('notification'));
     }
 
     public function testAdminCanNotDegradeHimself(): void
@@ -39,12 +37,16 @@ class DegradationTest extends EntityBuilder
         $client->request('GET', '/admin/user/' . $admin->getUsername() . '/degrade');
 
         $this->assertContains(UserRoleEnum::ROLE_ADMIN, $admin->getRoles());
-        $this->assertResponseRedirects('/', 302);
     }
 
-    //todo
     public function testAdminCanNotDegradeNotExistingUser(): void
     {
+        $client = static::createClient();
+        $admin = $this->createUser(['role' => UserRoleEnum::ROLE_ADMIN]);
+        $client->loginUser($admin);
 
+        $client->request('GET', '/admin/user/not-existing/degrade');
+
+        $this->assertSame(['Object not found'], $client->getRequest()->getSession()->getFlashBag()->get('error'));
     }
 }

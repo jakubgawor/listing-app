@@ -41,7 +41,7 @@ class BanUserTest extends EntityBuilder
 
         $client->request('GET', '/admin/user/' . $user->getUsername() . '/ban');
 
-        $this->assertResponseStatusCodeSame(500);
+        $this->assertSame(['User is already banned!'], $client->getRequest()->getSession()->getFlashBag()->get('error'));
     }
 
     public function testAdminCanNotBanOtherAdmin(): void
@@ -52,7 +52,7 @@ class BanUserTest extends EntityBuilder
 
         $client->request('GET', '/admin/user/' . $otherAdmin->getUsername() . '/ban');
 
-        $this->assertResponseStatusCodeSame(500);
+        $this->assertSame(false, $otherAdmin->isBanned());
     }
 
     public function testAdminCanNotBanHimself(): void
@@ -63,16 +63,17 @@ class BanUserTest extends EntityBuilder
 
         $client->request('GET', '/admin/user/' . $admin->getUsername() . '/ban');
 
-        $this->assertResponseStatusCodeSame(500);
+        $this->assertSame(false, $admin->isBanned());
     }
 
     public function testAdminCanNotBanNotExistingUser(): void
     {
-        static::createClient()
-            ->loginUser($this->createUser(['role' => UserRoleEnum::ROLE_ADMIN]))
-            ->request('GET', '/admin/user/not-existing/ban');
+        $client = static::createClient()
+            ->loginUser($this->createUser(['role' => UserRoleEnum::ROLE_ADMIN]));
 
-        $this->assertResponseRedirects('/', 302);
+        $client->request('GET', '/admin/user/not-existing/ban');
+
+        $this->assertSame(['Object not found'], $client->getRequest()->getSession()->getFlashBag()->get('error'));
     }
 
 }

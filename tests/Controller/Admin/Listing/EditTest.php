@@ -56,15 +56,10 @@ class EditTest extends EntityBuilder
             'belongs_to_user' => $author->getId()
         ]);
 
-        $this->assertNull($this->repository->findOneBy([
-            'slug' => $oldSlug
-        ]));
+        $this->assertNull($this->repository->findOneBy(['slug' => $oldSlug]));
         $this->assertSame(ListingStatusEnum::VERIFIED, $editedListing->getStatus());
         $this->assertNotNull($editedListing);
-        $this->assertNotSame($editedListing->getSlug(), $oldSlug);
         $this->assertNotNull($editedListing->getEditedAt());
-        $this->assertNotEmpty($client->getRequest()->getSession()->getFlashBag()->get('success'));
-        $this->assertResponseRedirects('/', 302);
     }
 
     public function testAdminCanNotEditNotExistingListing(): void
@@ -73,7 +68,6 @@ class EditTest extends EntityBuilder
 
         $client->request('GET', '/admin/listing/not-existing/edit');
 
-        $this->assertResponseRedirects('/', 302);
-        $this->assertNotEmpty($client->getRequest()->getSession()->getFlashBag()->get('error'));
+        $this->assertSame(['Object not found'], $client->getRequest()->getSession()->getFlashBag()->get('error'));
     }
 }

@@ -25,8 +25,7 @@ class PromotionTest extends EntityBuilder
 
         $client->request('GET', '/admin/user/' . $admin->getUsername() . '/promote');
 
-        $this->assertResponseRedirects('/', 302);
-        $this->assertNotNull($client->getRequest()->getSession()->getFlashBag()->get('notification'));
+        $this->assertSame(['You can not promote an admin!'], $client->getRequest()->getSession()->getFlashBag()->get('notification'));
     }
 
     public function testAdminCanNotPromoteOtherAdmin(): void
@@ -36,13 +35,15 @@ class PromotionTest extends EntityBuilder
 
         $client->request('GET', '/admin/user/' . $otherAdmin->getUsername() . '/promote');
 
-        $this->assertResponseRedirects('/', 302);
-        $this->assertNotNull($client->getRequest()->getSession()->getFlashBag()->get('notification'));
+        $this->assertSame(['You can not promote an admin!'], $client->getRequest()->getSession()->getFlashBag()->get('notification'));
     }
 
-    //todo
     public function testAdminCanNotPromoteNotExistingUser(): void
     {
+        $client = static::createClient()->loginUser($this->createUser(['role' => UserRoleEnum::ROLE_ADMIN]));
 
+        $client->request('GET', '/admin/user/not-existing/promote');
+
+        $this->assertSame(['Object not found'], $client->getRequest()->getSession()->getFlashBag()->get('error'));
     }
 }

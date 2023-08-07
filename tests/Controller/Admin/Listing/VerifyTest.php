@@ -33,7 +33,6 @@ class VerifyTest extends EntityBuilder
 
         $client->request('GET', '/admin/listing/' . $listing->getSlug() . '/verify');
 
-        $this->assertNotEmpty($client->getRequest()->getSession()->getFlashBag()->get('success'));
         $this->assertResponseRedirects('/listing/' . $listing->getSlug());
         $this->assertSame(ListingStatusEnum::VERIFIED, $this->repository->findOneBy(['slug' => $listing->getSlug()])->getStatus());
     }
@@ -45,8 +44,7 @@ class VerifyTest extends EntityBuilder
 
         $client->request('GET', '/admin/listing/' . $listing->getSlug() . '/verify');
 
-        $this->assertNotEmpty($client->getRequest()->getSession()->getFlashBag()->get('notification'));
-        $this->assertResponseRedirects('/', 302);
+        $this->assertSame(['This listing is already verified!'], $client->getRequest()->getSession()->getFlashBag()->get('notification'));
     }
 
     public function testAdminCanNotVerifyNotExistingListing(): void
@@ -55,8 +53,7 @@ class VerifyTest extends EntityBuilder
 
         $client->request('GET', '/admin/listing/not-existing/verify');
 
-        $this->assertNotEmpty($client->getRequest()->getSession()->getFlashBag()->get('error'));
-        $this->assertResponseRedirects('/', 302);
+        $this->assertSame(['Object not found'], $client->getRequest()->getSession()->getFlashBag()->get('error'));
     }
 
     private function listing(string $status): Listing

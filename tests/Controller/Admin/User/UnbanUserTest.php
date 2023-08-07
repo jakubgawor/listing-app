@@ -26,16 +26,16 @@ class UnbanUserTest extends EntityBuilder
 
         $client->request('GET', '/admin/user/' . $user->getUsername() . '/unban');
 
-        $this->assertResponseStatusCodeSame(500);
+        $this->assertSame(['User is not banned'], $client->getRequest()->getSession()->getFlashBag()->get('error'));
     }
 
     public function testAdminCanNotUnbanNotExistingUser(): void
     {
-        static::createClient()
-            ->loginUser($this->createUser(['role' => UserRoleEnum::ROLE_ADMIN]))
+        $client = static::createClient();
+        $client->loginUser($this->createUser(['role' => UserRoleEnum::ROLE_ADMIN]))
             ->request('GET', '/admin/user/not-existing/ban');
 
-        $this->assertResponseRedirects('/', 302);
+        $this->assertSame(['Object not found'], $client->getRequest()->getSession()->getFlashBag()->get('error'));
     }
 
 }
