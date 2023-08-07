@@ -23,7 +23,7 @@ class UserProfileController extends AbstractController
 
     #[Route('/user/{username}', name: 'app_user_profile')]
     #[IsGranted(UserRoleEnum::ROLE_USER)]
-    public function index(User $user): Response
+    public function index(?User $user): Response
     {
         return $this->render('user_profile/index.html.twig', [
             'user' => $user
@@ -32,7 +32,7 @@ class UserProfileController extends AbstractController
 
     #[Route('/user/{username}/edit', name: 'app_user_profile_edit')]
     #[IsGranted(UserRoleEnum::ROLE_USER_EMAIL_VERIFIED)]
-    public function edit(Request $request, User $user, UserProfileFormHandler $userProfileFormHandler): Response
+    public function edit(Request $request, ?User $user, UserProfileFormHandler $userProfileFormHandler): Response
     {
         $this->authorizationService->denyUnauthorizedUserAccess($user);
 
@@ -53,7 +53,7 @@ class UserProfileController extends AbstractController
 
     #[Route('/user/{username}/delete', name: 'app_user_profile_delete', methods: 'GET')]
     #[IsGranted(UserRoleEnum::ROLE_USER_EMAIL_VERIFIED)]
-    public function delete(User $user, UserService $userService): Response
+    public function delete(?User $user, UserService $userService): Response
     {
         $this->authorizationService->denyUnauthorizedUserAccess($user);
         $userService->deleteUser($user);

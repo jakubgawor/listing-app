@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Admin{% endblock %}
+
+{% block body %}
+
+    {% for user in users %}
+        <div class="mb-4">
+            User: {{ user.username }}
+            IsVerified: {{ user.verified }}
+            Is banned? {{ user.banned }}
+        </div>
+    {% endfor %}
+
+{% endblock %}

@@ -39,7 +39,7 @@ class AccessTest extends EntityBuilder
         $client->request('GET', '/listing/' . $listing->getSlug());
 
         $this->assertResponseRedirects('/', 302);
-        $this->assertNotEmpty($client->getRequest()->getSession()->getFlashBag()->get('error'));
+        $this->assertNotEmpty($client->getRequest()->getSession()->getFlashBag()->get('notification'));
     }
 
     public function testDoNotRenderNotExistingListing(): void
@@ -108,7 +108,7 @@ class AccessTest extends EntityBuilder
         $client->request('GET', '/listing/' . $listing->getSlug() . '/edit');
 
         $this->assertResponseRedirects('/', 302);
-        $this->assertNotEmpty($client->getRequest()->getSession()->getFlashBag()->get('error'));
+        $this->assertNotEmpty($client->getRequest()->getSession()->getFlashBag()->get('notification'));
     }
 
     public function testEditListingPageCanNotBeRenderedIfTheUserIsNotTheOwnerOfTheListing(): void

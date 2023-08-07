@@ -52,4 +52,13 @@ class DeleteTest extends EntityBuilder
         $this->assertNotNull($this->repository->findOneBy(['id' => $otherAdmin->getId()]));
         $this->assertResponseRedirects('/', 302);
     }
+
+    public function testAdminCanNotDeleteNotExistingUserAccount(): void
+    {
+        static::createClient()
+            ->loginUser($this->createUser(['role' => UserRoleEnum::ROLE_ADMIN]))
+            ->request('GET', '/admin/user/not-existing/delete');
+
+        $this->assertResponseRedirects('/', 302);
+    }
 }

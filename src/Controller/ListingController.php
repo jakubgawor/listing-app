@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Listing;
+use App\Enum\ListingStatusEnum;
 use App\Enum\UserRoleEnum;
 use App\Form\Handler\ListingFormHandler;
 use App\Repository\ListingRepository;
@@ -17,9 +18,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class ListingController extends AbstractController
 {
     public function __construct(
-        private readonly ListingRepository  $listingRepository,
-        private readonly ListingFormHandler $listingFormHandler,
-        private readonly ListingService     $listingService,
+        private readonly ListingRepository    $listingRepository,
+        private readonly ListingFormHandler   $listingFormHandler,
         private readonly AuthorizationService $authorizationService
     )
     {
@@ -34,10 +34,15 @@ class ListingController extends AbstractController
     }
 
     #[Route('/listing/{slug}', name: 'app_show_listing')]
-    public function showListing(string $slug): Response
+    public function showListing(?Listing $listing): Response
     {
+        if ($listing->getStatus() === ListingStatusEnum::NOT_VERIFIED) {
+            $this->addFlash('notification', 'This listing is not verified!');
+            return $this->redirectToRoute('app_index');
+        }
+
         return $this->render('listing/showListing.html.twig', [
-            'listing' => $this->listingService->find($slug)
+            'listing' => $listing
         ]);
     }
 
@@ -59,9 +64,16 @@ class ListingController extends AbstractController
 
     #[Route('/listing/{slug}/edit', name: 'app_listing_edit')]
     #[IsGranted(UserRoleEnum::ROLE_USER_EMAIL_VERIFIED)]
-    public function edit(string $slug, Request $request): Response
+    public function edit(?Listing $listing, Request $request): Response
     {
-        $form = $this->listingFormHandler->handle($this->getUser(), $request, $this->findAndAuthorize($slug));
+        if ($listing->getStatus() === ListingStatusEnum::NOT_VERIFIED) {
+            $this->addFlash('notification', 'This listing is not verified!');
+            return $this->redirectToRoute('app_index');
+        }
+
+        $this->authorizationService->denyUnauthorizedUserAccess($listing->getBelongsToUser());
+
+        $form = $this->listingFormHandler->handle($this->getUser(), $request, $listing);
 
         if ($form === true) {
             $this->addFlash('success', 'Your listing has been updated!');
@@ -75,19 +87,18 @@ class ListingController extends AbstractController
 
     #[Route('/listing/{slug}/delete', name: 'app_listing_delete')]
     #[IsGranted(UserRoleEnum::ROLE_USER_EMAIL_VERIFIED)]
-    public function delete(string $slug, ListingService $listingService): Response
+    public function delete(?Listing $listing, ListingService $listingService): Response
     {
-        $listingService->deleteListing($this->findAndAuthorize($slug));
+        if ($listing->getStatus() === ListingStatusEnum::NOT_VERIFIED) {
+            $this->addFlash('notification', 'This listing is not verified!');
+            return $this->redirectToRoute('app_index');
+        }
+
+        $this->authorizationService->denyUnauthorizedUserAccess($listing->getBelongsToUser());
+        $listingService->deleteListing($listing);
 
         $this->addFlash('success', 'Your listing has been deleted!');
         return $this->redirectToRoute('app_index');
     }
 
-
-    private function findAndAuthorize(string $slug): Listing
-    {
-        $listing = $this->listingService->find($slug);
-        $this->authorizationService->denyUnauthorizedUserAccess($listing->getBelongsToUser());
-        return $listing;
-    }
 }

@@ -48,7 +48,7 @@ class DeleteTest extends EntityBuilder
         $client->request('GET', '/listing/' . $listing->getSlug() . '/delete');
 
         $this->assertResponseRedirects('/', 302);
-        $this->assertNotEmpty($client->getRequest()->getSession()->getFlashBag()->get('error'));
+        $this->assertNotEmpty($client->getRequest()->getSession()->getFlashBag()->get('notification'));
     }
 
     public function testUserCanNotDeleteSomeoneElseListing(): void

@@ -39,4 +39,10 @@ class PromotionTest extends EntityBuilder
         $this->assertResponseRedirects('/', 302);
         $this->assertNotNull($client->getRequest()->getSession()->getFlashBag()->get('notification'));
     }
+
+    //todo
+    public function testAdminCanNotPromoteNotExistingUser(): void
+    {
+
+    }
 }

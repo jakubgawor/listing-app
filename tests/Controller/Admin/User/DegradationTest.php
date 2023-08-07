@@ -42,4 +42,9 @@ class DegradationTest extends EntityBuilder
         $this->assertResponseRedirects('/', 302);
     }
 
+    //todo
+    public function testAdminCanNotDegradeNotExistingUser(): void
+    {
+
+    }
 }

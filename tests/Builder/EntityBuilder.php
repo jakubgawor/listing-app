@@ -58,6 +58,7 @@ abstract class EntityBuilder extends WebTestCase implements EntityBuilderInterfa
             ->setStatus($status)
             ->setBelongsToUser($user);
 
+        $entityManager->persist($user->addListing($listing));
         $entityManager->persist($listing);
         $entityManager->flush();
 

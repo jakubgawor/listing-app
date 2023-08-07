@@ -19,12 +19,14 @@ class AuthorizationService
 
     public function denyUnauthorizedUserAccess(User $user): void
     {
-        if(!$this->authorizationChecker->isGranted(SameUsernameVoter::IS_SAME_USER, $user->getUserIdentifier())) {
+        if (!$this->authorizationChecker->isGranted(SameUsernameVoter::IS_SAME_USER, $user->getUserIdentifier())) {
             throw new UnauthorizedAccessException('You do not have permissions to access this page!', 403);
         }
 
-        if(in_array(UserRoleEnum::ROLE_ADMIN, $user->getRoles())) {
+        if (in_array(UserRoleEnum::ROLE_ADMIN, $user->getRoles())) {
             throw new AdminDeletionException('You can not delete yourself!');
         }
     }
+
+
 }

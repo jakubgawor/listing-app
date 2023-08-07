@@ -45,6 +45,17 @@ class DeleteTest extends EntityBuilder
         $this->assertNotEmpty($client->getRequest()->getSession()->getFlashBag()->get('error'));
     }
 
+    public function testUserCanNotDeleteNotExistingProfile(): void
+    {
+        $client = static::createClient();
+        $user = $this->createUser();
+        $client->loginUser($user);
+
+        $client->request('GET', '/user/not-existing/delete');
+
+        $this->assertResponseRedirects('/', 302);
+    }
+
     public function testAdminCanNotDeleteHisProfile(): void
     {
         $client = static::createClient();

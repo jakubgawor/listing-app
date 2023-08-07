@@ -3,7 +3,6 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Listing;
-use App\Exception\ListingNotFoundException;
 use App\Form\Handler\ListingFormHandler;
 use App\Repository\ListingRepository;
 use App\Service\AdminService;
@@ -41,9 +40,9 @@ class AdminListingController extends AbstractController
     }
 
     #[Route('/admin/listing/{slug}/verify', name: 'app_admin_verify')]
-    public function verify(string $slug): Response
+    public function verify(?Listing $listing): Response
     {
-        $listing = $this->adminService->verifyListing($this->listingRepository->findOneBySlug($slug));
+        $this->adminService->verifyListing($listing);
 
         $this->addFlash('success', 'Successfully verified  listing!' . $listing->getStatus());
         return $this->redirectToRoute('app_show_listing', [
@@ -52,10 +51,8 @@ class AdminListingController extends AbstractController
     }
 
     #[Route('/admin/listing/{slug}/edit', name: 'app_admin_edit')]
-    public function edit(string $slug, Request $request): Response
+    public function edit(?Listing $listing, Request $request): Response
     {
-        $listing = $this->findListing($slug);
-
         $form = $this->listingFormHandler->handle($listing->getBelongsToUser(), $request, $listing, $this->getUser());
 
         if ($form === true) {
@@ -69,25 +66,12 @@ class AdminListingController extends AbstractController
     }
 
     #[Route('/admin/listing/{slug}/delete', name: 'app_admin_delete')]
-    public function delete(string $slug): Response
+    public function delete(?Listing $listing): Response
     {
-        $this->listingService->deleteListing($this->findListing($slug));
+        $this->listingService->deleteListing($listing);
 
         $this->addFlash('success', 'Listing has been deleted!');
         return $this->redirectToRoute('app_index');
     }
 
-    /**
-     * @throws ListingNotFoundException
-     */
-    private function findListing(string $slug): Listing
-    {
-        $listing = $this->listingRepository->findOneBySlug($slug);
-
-        if ($listing === null) {
-            throw new ListingNotFoundException('Listing not found', 404);
-        }
-
-        return $listing;
-    }
 }

@@ -8,6 +8,7 @@ use App\Exception\AdminPromotionException;
 use App\Exception\ListingNotFoundException;
 use App\Exception\RepeatedVerificationException;
 use App\Exception\UnauthorizedAccessException;
+use App\Exception\ObjectNotFoundException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -25,7 +26,8 @@ class ExceptionSubscriber implements EventSubscriberInterface
             RepeatedVerificationException::class => ['flashType' => 'notification', 'path' => '/'],
             AdminDeletionException::class => ['flashType' => 'error', 'path' => '/'],
             AdminPromotionException::class => ['flashType' => 'notification', 'path' => '/'],
-            AdminDegradationException::class => ['flashType' => 'notification', 'path' => '/']
+            AdminDegradationException::class => ['flashType' => 'notification', 'path' => '/'],
+            ObjectNotFoundException::class => ['flashType' => 'error', 'path' => '/']
         ];
 
         foreach ($exceptionClassMap as $exceptionClass => $details) {
