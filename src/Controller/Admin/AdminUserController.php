@@ -3,12 +3,9 @@
 namespace App\Controller\Admin;
 
 use App\Entity\User;
-use App\Enum\UserRoleEnum;
-use App\Exception\AdminDegradationException;
-use App\Exception\BanUserException;
+use App\Repository\UserRepository;
 use App\Service\AdminService;
 use App\Service\User\UserService;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -16,70 +13,63 @@ use Symfony\Component\Routing\Annotation\Route;
 class AdminUserController extends AbstractController
 {
     public function __construct(
-        private readonly UserService  $userService,
-        private readonly AdminService $adminService
+        private readonly UserRepository $userRepository,
+        private readonly UserService    $userService,
+        private readonly AdminService   $adminService
     )
     {
     }
 
+    #[Route('/admin/users', name: 'app_admin_users')]
+    public function users(): Response
+    {
+        return $this->render('admin/users.html.twig', [
+            'users' => $this->userRepository->findAll()
+        ]);
+    }
+
     #[Route('/admin/user/{username}/delete', name: 'app_admin_delete_user')]
-    public function deleteUser(User $user): Response
+    public function deleteUser(?User $user): Response
     {
         $this->userService->deleteUser($user);
 
-        $this->addFlash('/', 'User has been deleted!');
+        $this->addFlash('success', 'User has been deleted!');
         return $this->redirectToRoute('app_index');
     }
 
     #[Route('/admin/user/{username}/promote', name: 'app_admin_promote')]
-    public function promoteToAdmin(User $user): Response
+    public function promoteToAdmin(?User $user): Response
     {
         $this->adminService->promoteToAdmin($user);
 
-        $this->addFlash('/', 'User has been promoted!');
+        $this->addFlash('success', 'User has been promoted!');
         return $this->redirectToRoute('app_index');
     }
 
     #[Route('/admin/user/{username}/degrade', name: 'app_admin_degrade')]
-    public function degradeToUser(User $user): Response
+    public function degradeToUser(?User $user): Response
     {
-        if ($user === $this->getUser()) {
-            throw new AdminDegradationException('You can not degrade yourself!');
-        }
-
         $this->adminService->degradeToUser($user);
 
-        $this->addFlash('/', 'Admin has been degraded!');
+        $this->addFlash('success', 'Admin has been degraded!');
         return $this->redirectToRoute('app_index');
     }
 
     #[Route('/admin/user/{username}/ban', name: 'app_admin_ban')]
-    public function banUser(User $user, EntityManagerInterface $entityManager): Response
+    public function banUser(?User $user): Response
     {
-        if ($user->isBanned() === true) {
-            throw new BanUserException('User is already banned!');
-        }
+        $this->adminService->banUser($user);
 
-        if (in_array(UserRoleEnum::ROLE_ADMIN, $user->getRoles())) {
-            throw new BanUserException('You can not ban users with admin roles!');
-        }
-
-        foreach ($user->getListings() as $listing) {
-            $entityManager->remove($listing);
-        }
-
-        $entityManager->persist($user->setIsBanned(true));
-        $entityManager->flush();
-
+        $this->addFlash('success', 'User ' . $user->getUsername() . ' has been banned!');
         return $this->redirectToRoute('app_index');
     }
 
-    #[Route('/admin/user/{username}/ban', name: 'app_admin_unban')]
-    public function unbanUser(): Response
+    #[Route('/admin/user/{username}/unban', name: 'app_admin_unban')]
+    public function unbanUser(?User $user): Response
     {
-        // check if the user is banned
-        // set $user ban value to false
+        $this->adminService->unbanUser($user);
 
+        $this->addFlash('success', 'User ' . $user->getUsername() . ' has been unbanned!');
         return $this->redirectToRoute('app_index');
     }
 
