@@ -53,7 +53,7 @@ class AdminListingController extends AbstractController
     #[Route('/admin/listing/{slug}/edit', name: 'app_admin_edit')]
     public function edit(?Listing $listing, Request $request): Response
     {
-        $form = $this->listingFormHandler->handle($listing->getBelongsToUser(), $request, $listing, $this->getUser());
+        $form = $this->listingFormHandler->handle($listing->getBelongsToUser(), $request, $listing);
 
         if ($form === true) {
             $this->addFlash('success', 'Listing has been updated!');

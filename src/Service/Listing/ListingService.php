@@ -8,11 +8,13 @@ use App\Enum\ListingStatusEnum;
 use App\Enum\UserRoleEnum;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
 
 class ListingService
 {
     public function __construct(
-        private readonly EntityManagerInterface $entityManager
+        private readonly EntityManagerInterface $entityManager,
+        private readonly Security $security
     )
     {
     }
@@ -33,7 +35,7 @@ class ListingService
             $this->entityManager->persist($listing->setStatus(ListingStatusEnum::NOT_VERIFIED));
         }
 
-        if ($admin) {
+        if (in_array(UserRoleEnum::ROLE_ADMIN, $this->security->getUser()->getRoles())) {
             $this->entityManager->persist($listing->setStatus(ListingStatusEnum::VERIFIED));
         }
 

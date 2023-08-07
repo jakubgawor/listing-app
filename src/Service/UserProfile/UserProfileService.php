@@ -8,7 +8,9 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class UserProfileService
 {
-    public function __construct(private EntityManagerInterface $entityManager)
+    public function __construct(
+        private readonly EntityManagerInterface $entityManager
+    )
     {
     }
 
