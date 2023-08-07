@@ -50,6 +50,11 @@ class ListingController extends AbstractController
     #[IsGranted(UserRoleEnum::ROLE_USER_EMAIL_VERIFIED)]
     public function create(Request $request): Response
     {
+        if($this->getUser()->isBanned()) {
+            $this->addFlash('error', 'You are banned');
+            return $this->redirectToRoute('app_index');
+        }
+
         $form = $this->listingFormHandler->handle($this->getUser(), $request);
 
         if ($form === true) {

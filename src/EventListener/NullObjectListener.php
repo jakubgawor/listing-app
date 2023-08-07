@@ -11,7 +11,7 @@ class NullObjectListener
     {
         foreach ($event->getArguments() as $argument) {
             if ($argument === null) {
-                throw new ObjectNotFoundException('Object not found!');
+                throw new ObjectNotFoundException();
             }
         }
     }
