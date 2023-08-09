@@ -40,6 +40,9 @@ class Listing
     #[ORM\JoinColumn(nullable: false)]
     private ?User $belongs_to_user = null;
 
+    #[ORM\Column]
+    private ?int $views = 0;
+
 
     #[ORM\PrePersist]
     public function setInitialValues(): void
@@ -157,5 +160,18 @@ class Listing
 
         return $slug . '_' . uniqid();
     }
+
+    public function getViews(): ?int
+    {
+        return $this->views;
+    }
+
+    public function incrementViews(): static
+    {
+        $this->views++;
+
+        return $this;
+    }
+
 
 }

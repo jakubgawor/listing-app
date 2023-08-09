@@ -20,7 +20,8 @@ class ListingController extends AbstractController
     public function __construct(
         private readonly ListingRepository    $listingRepository,
         private readonly ListingFormHandler   $listingFormHandler,
-        private readonly AuthorizationService $authorizationService
+        private readonly AuthorizationService $authorizationService,
+        private readonly ListingService $listingService
     )
     {
     }
@@ -36,10 +37,7 @@ class ListingController extends AbstractController
     #[Route('/listing/{slug}', name: 'app_show_listing')]
     public function showListing(?Listing $listing): Response
     {
-        if ($listing->getStatus() === ListingStatusEnum::NOT_VERIFIED) {
-            $this->addFlash('notification', 'This listing is not verified!');
-            return $this->redirectToRoute('app_index');
-        }
+        $listing = $this->listingService->showOne($listing);
 
         return $this->render('listing/showListing.html.twig', [
             'listing' => $listing
@@ -92,7 +90,7 @@ class ListingController extends AbstractController
 
     #[Route('/listing/{slug}/delete', name: 'app_listing_delete')]
     #[IsGranted(UserRoleEnum::ROLE_USER_EMAIL_VERIFIED)]
-    public function delete(?Listing $listing, ListingService $listingService): Response
+    public function delete(?Listing $listing): Response
     {
         if ($listing->getStatus() === ListingStatusEnum::NOT_VERIFIED) {
             $this->addFlash('notification', 'This listing is not verified!');
@@ -100,7 +98,7 @@ class ListingController extends AbstractController
         }
 
         $this->authorizationService->denyUnauthorizedUserAccess($listing->getBelongsToUser());
-        $listingService->deleteListing($listing);
+        $this->listingService->deleteListing($listing);
 
         $this->addFlash('success', 'Your listing has been deleted!');
         return $this->redirectToRoute('app_index');

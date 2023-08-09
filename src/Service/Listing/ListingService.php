@@ -6,6 +6,7 @@ use App\Entity\Listing;
 use App\Entity\User;
 use App\Enum\ListingStatusEnum;
 use App\Enum\UserRoleEnum;
+use App\Exception\UnauthorizedAccessException;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -17,6 +18,18 @@ class ListingService
         private readonly Security $security
     )
     {
+    }
+
+    public function showOne(Listing $listing): Listing
+    {
+        if ($listing->getStatus() === ListingStatusEnum::NOT_VERIFIED) {
+            throw new UnauthorizedAccessException('This listing is not verified.');
+        }
+
+        $this->entityManager->persist($listing->incrementViews());
+        $this->entityManager->flush();
+
+        return $listing;
     }
 
     public function create(Listing $listing, User $user): void

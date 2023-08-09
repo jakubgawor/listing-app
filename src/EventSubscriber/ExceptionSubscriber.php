@@ -6,7 +6,6 @@ use App\Exception\AdminDegradationException;
 use App\Exception\AdminDeletionException;
 use App\Exception\AdminPromotionException;
 use App\Exception\BanUserException;
-use App\Exception\ListingNotFoundException;
 use App\Exception\RepeatedVerificationException;
 use App\Exception\UnauthorizedAccessException;
 use App\Exception\ObjectNotFoundException;
@@ -22,7 +21,6 @@ class ExceptionSubscriber implements EventSubscriberInterface
         $exception = $event->getThrowable();
 
         $exceptionClassMap = [
-            ListingNotFoundException::class => ['flashType' => 'error', 'path' => '/'],
             UnauthorizedAccessException::class => ['flashType' => 'error', 'path' => '/'],
             RepeatedVerificationException::class => ['flashType' => 'notification', 'path' => '/'],
             AdminDeletionException::class => ['flashType' => 'error', 'path' => '/'],
