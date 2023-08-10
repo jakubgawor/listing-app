@@ -21,7 +21,7 @@ class SendEmailNotificationHandler
         $email = (new Email())
             ->from('mailer@listing-app.com')
             ->bcc(...$sendEmailNotification->getEmails())
-            ->subject('New listing to verify!')
+            ->subject($sendEmailNotification->getSubject())
             ->html($sendEmailNotification->getContent());
 
         $this->mailer->send($email);

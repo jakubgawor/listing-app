@@ -2,6 +2,8 @@
 
 namespace App\Service;
 
+use App\Entity\Listing;
+use App\Entity\User;
 use App\Message\SendEmailNotification;
 use App\Repository\UserRepository;
 use App\Service\Config\AppConfig;
@@ -31,6 +33,15 @@ class EmailService
             'verifyUrl' => $this->appConfig->getBaseUrl() . '/admin/listing/' . $slug . '/verify'
         ]);
 
-        $this->bus->dispatch(new SendEmailNotification($adminEmails, $message));
+        $this->bus->dispatch(new SendEmailNotification($adminEmails, 'New listing to verify!', $message));
+    }
+
+    public function notifyUserAboutListingVerification(User $user, Listing $listing): void
+    {
+        $message = $this->twig->render('_emails/_notification-about-listing-verification.html.twig', [
+            'listingUrl' => $this->appConfig->getBaseUrl() . '/listing/' . $listing->getSlug()
+        ]);
+
+        $this->bus->dispatch(new SendEmailNotification([$user->getEmail()], 'Listing ' . $listing->getTitle() . ' has been verified!', $message));
     }
 }

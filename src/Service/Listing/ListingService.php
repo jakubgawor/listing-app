@@ -69,10 +69,4 @@ class ListingService
         $this->entityManager->flush();
     }
 
-    public function verifyListing(Listing $listing): void
-    {
-        $this->entityManager->persist($listing->setStatus(ListingStatusEnum::VERIFIED));
-        $this->entityManager->flush();
-    }
-
 }

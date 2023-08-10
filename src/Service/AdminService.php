@@ -10,16 +10,15 @@ use App\Exception\AdminDegradationException;
 use App\Exception\AdminPromotionException;
 use App\Exception\BanUserException;
 use App\Exception\RepeatedVerificationException;
-use App\Service\Listing\ListingService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 
 class AdminService
 {
     public function __construct(
-        private readonly ListingService $listingService,
         private readonly EntityManagerInterface $entityManager,
         private readonly Security $security,
+        private readonly EmailService $emailService
     )
     {
     }
@@ -29,7 +28,12 @@ class AdminService
         if ($listing->getStatus() === ListingStatusEnum::VERIFIED) {
             throw new RepeatedVerificationException('This listing is already verified!');
         }
-        $this->listingService->verifyListing($listing);
+
+        $this->entityManager->persist($listing->setStatus(ListingStatusEnum::VERIFIED));
+
+        $this->emailService->notifyUserAboutListingVerification($listing->getBelongsToUser(), $listing);
+
+        $this->entityManager->flush();
 
         return $listing;
     }

@@ -44,7 +44,7 @@ class AdminListingController extends AbstractController
     {
         $this->adminService->verifyListing($listing);
 
-        $this->addFlash('success', 'Successfully verified  listing!' . $listing->getStatus());
+        $this->addFlash('success', 'Successfully verified  listing! ' . $listing->getTitle());
         return $this->redirectToRoute('app_show_listing', [
             'slug' => $listing->getSlug()
         ]);
