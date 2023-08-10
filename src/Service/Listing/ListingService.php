@@ -7,6 +7,9 @@ use App\Entity\User;
 use App\Enum\ListingStatusEnum;
 use App\Enum\UserRoleEnum;
 use App\Exception\UnauthorizedAccessException;
+use App\Message\SendEmailNotification;
+use App\Repository\UserRepository;
+use App\Service\EmailService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -15,7 +18,8 @@ class ListingService
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
-        private readonly Security $security
+        private readonly Security $security,
+        private readonly EmailService $emailService
     )
     {
     }
@@ -39,6 +43,9 @@ class ListingService
         }
 
         $this->entityManager->persist($listing->setBelongsToUser($user));
+
+        $this->emailService->notifyAdminAboutNewListing($listing->getSlug());
+
         $this->entityManager->flush();
     }
 
