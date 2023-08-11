@@ -3,11 +3,14 @@
 namespace App\Entity;
 
 use App\Repository\CategoryRepository;
+use App\Traits\SlugTrait;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
 class Category
 {
+    use SlugTrait;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -25,6 +28,13 @@ class Category
 
     #[ORM\OneToOne(mappedBy: 'category', cascade: ['persist', 'remove'])]
     private ?Listing $listing = null;
+
+
+    #[ORM\PrePersist]
+    public function setInitialValues(): void
+    {
+        $this->slug = $this->createSlug($this->category);
+    }
 
     public function getId(): ?int
     {

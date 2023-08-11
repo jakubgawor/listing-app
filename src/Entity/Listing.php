@@ -4,15 +4,18 @@ namespace App\Entity;
 
 use App\Enum\ListingStatusEnum;
 use App\Repository\ListingRepository;
+use App\Traits\SlugTrait;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\String\Slugger\AsciiSlugger;
+use Symfony\ComponentString\Slugger\AsciiSlugger;
 
 #[ORM\Entity(repositoryClass: ListingRepository::class)]
 #[ORM\HasLifecycleCallbacks]
 class Listing
 {
+    use SlugTrait;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -154,15 +157,6 @@ class Listing
         $this->belongs_to_user = $belongs_to_user;
 
         return $this;
-    }
-
-
-    private function createSlug(string $title): string
-    {
-        $slugger = new AsciiSlugger();
-        $slug = $slugger->slug($title)->lower();
-
-        return $slug . '_' . uniqid();
     }
 
     public function getViews(): ?int
