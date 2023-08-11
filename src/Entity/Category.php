@@ -4,9 +4,13 @@ namespace App\Entity;
 
 use App\Repository\CategoryRepository;
 use App\Traits\SlugTrait;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
+#[UniqueEntity(fields: ['category'], message: 'Category with this name already exists!')]
 class Category
 {
     use SlugTrait;
@@ -23,17 +27,12 @@ class Category
     #[ORM\JoinColumn(nullable: false)]
     private ?User $added_by = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $slug = null;
+    #[ORM\OneToMany(mappedBy: 'category', targetEntity: Listing::class, orphanRemoval: true)]
+    private Collection $listings;
 
-    #[ORM\OneToOne(mappedBy: 'category', cascade: ['persist', 'remove'])]
-    private ?Listing $listing = null;
-
-
-    #[ORM\PrePersist]
-    public function setInitialValues(): void
+    public function __construct()
     {
-        $this->slug = $this->createSlug($this->category);
+        $this->listings = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -65,32 +64,35 @@ class Category
         return $this;
     }
 
-    public function getSlug(): ?string
+
+    /**
+     * @return Collection<int, Listing>
+     */
+    public function getListings(): Collection
     {
-        return $this->slug;
+        return $this->listings;
     }
 
-    public function setSlug(string $slug): static
+    public function addListing(Listing $listing): static
     {
-        $this->slug = $slug;
-
-        return $this;
-    }
-
-    public function getListing(): ?Listing
-    {
-        return $this->listing;
-    }
-
-    public function setListing(Listing $listing): static
-    {
-        // set the owning side of the relation if necessary
-        if ($listing->getCategory() !== $this) {
+        if (!$this->listings->contains($listing)) {
+            $this->listings->add($listing);
             $listing->setCategory($this);
         }
 
-        $this->listing = $listing;
+        return $this;
+    }
+
+    public function removeListing(Listing $listing): static
+    {
+        if ($this->listings->removeElement($listing)) {
+            // set the owning side to null (unless already changed)
+            if ($listing->getCategory() === $this) {
+                $listing->setCategory(null);
+            }
+        }
 
         return $this;
     }
+
 }

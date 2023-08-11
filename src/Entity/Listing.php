@@ -8,7 +8,6 @@ use App\Traits\SlugTrait;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\ComponentString\Slugger\AsciiSlugger;
 
 #[ORM\Entity(repositoryClass: ListingRepository::class)]
 #[ORM\HasLifecycleCallbacks]
@@ -46,7 +45,7 @@ class Listing
     #[ORM\Column]
     private ?int $views = 0;
 
-    #[ORM\OneToOne(inversedBy: 'listing', cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(inversedBy: 'listings')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Category $category = null;
 
@@ -176,12 +175,13 @@ class Listing
         return $this->category;
     }
 
-    public function setCategory(Category $category): static
+    public function setCategory(?Category $category): static
     {
         $this->category = $category;
 
         return $this;
     }
+
 
 
 }

@@ -7,8 +7,6 @@ use App\Entity\User;
 use App\Enum\ListingStatusEnum;
 use App\Enum\UserRoleEnum;
 use App\Exception\UnauthorizedAccessException;
-use App\Message\SendEmailNotification;
-use App\Repository\UserRepository;
 use App\Service\EmailService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
@@ -49,7 +47,7 @@ class ListingService
         $this->entityManager->flush();
     }
 
-    public function edit(Listing $listing, User $user, ?User $admin = null): void
+    public function edit(Listing $listing, User $user): void
     {
         if (!in_array(UserRoleEnum::ROLE_ADMIN, $user->getRoles())) {
             $this->entityManager->persist($listing->setStatus(ListingStatusEnum::NOT_VERIFIED));
