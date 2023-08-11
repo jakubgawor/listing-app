@@ -43,6 +43,10 @@ class Listing
     #[ORM\Column]
     private ?int $views = 0;
 
+    #[ORM\OneToOne(inversedBy: 'listing', cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Category $category = null;
+
 
     #[ORM\PrePersist]
     public function setInitialValues(): void
@@ -169,6 +173,18 @@ class Listing
     public function incrementViews(): static
     {
         $this->views++;
+
+        return $this;
+    }
+
+    public function getCategory(): ?Category
+    {
+        return $this->category;
+    }
+
+    public function setCategory(Category $category): static
+    {
+        $this->category = $category;
 
         return $this;
     }

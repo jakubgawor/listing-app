@@ -21,6 +21,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->created_at = new \DateTime();
         $this->listings = new ArrayCollection();
+        $this->categories = new ArrayCollection();
     }
 
     #[ORM\Id]
@@ -58,6 +59,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column]
     private ?bool $isBanned = false;
+
+    #[ORM\OneToMany(mappedBy: 'added_by', targetEntity: Category::class)]
+    private Collection $categories;
 
     public function getId(): ?int
     {
@@ -220,6 +224,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setIsBanned(bool $isBanned): static
     {
         $this->isBanned = $isBanned;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Category>
+     */
+    public function getCategories(): Collection
+    {
+        return $this->categories;
+    }
+
+    public function addCategory(Category $category): static
+    {
+        if (!$this->categories->contains($category)) {
+            $this->categories->add($category);
+            $category->setAddedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCategory(Category $category): static
+    {
+        if ($this->categories->removeElement($category)) {
+            // set the owning side to null (unless already changed)
+            if ($category->getAddedBy() === $this) {
+                $category->setAddedBy(null);
+            }
+        }
 
         return $this;
     }
