@@ -3,14 +3,15 @@
 namespace App\Traits;
 
 use Symfony\Component\String\Slugger\AsciiSlugger;
+use Symfony\Component\Uid\Uuid;
 
 trait SlugTrait
 {
-    private function createSlug(string $toSlug): string
+    public function createSlug(string $toSlug): string
     {
         $slugger = new AsciiSlugger();
         $slug = $slugger->slug($toSlug)->lower();
 
-        return $slug . '_' . uniqid();
+        return $slug . '_' . Uuid::v7();
     }
 }
