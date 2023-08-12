@@ -5,9 +5,10 @@ namespace App\Controller;
 use App\Entity\Listing;
 use App\Enum\ListingStatusEnum;
 use App\Enum\UserRoleEnum;
+use App\Form\Handler\EntityFormHandler;
 use App\Form\Handler\ListingFormHandler;
 use App\Repository\ListingRepository;
-use App\Service\AuthorizationService;
+use App\Service\Authorization\AuthorizationService;
 use App\Service\Listing\ListingService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,9 +20,9 @@ class ListingController extends AbstractController
 {
     public function __construct(
         private readonly ListingRepository    $listingRepository,
-        private readonly ListingFormHandler   $listingFormHandler,
+        private readonly EntityFormHandler    $entityFormHandler,
         private readonly AuthorizationService $authorizationService,
-        private readonly ListingService $listingService
+        private readonly ListingService       $listingService
     )
     {
     }
@@ -48,12 +49,12 @@ class ListingController extends AbstractController
     #[IsGranted(UserRoleEnum::ROLE_USER_EMAIL_VERIFIED)]
     public function create(Request $request): Response
     {
-        if($this->getUser()->isBanned()) {
+        if ($this->getUser()->isBanned()) {
             $this->addFlash('error', 'You are banned');
             return $this->redirectToRoute('app_index');
         }
 
-        $form = $this->listingFormHandler->handle($this->getUser(), $request);
+        $form = $this->entityFormHandler->handle($this->getUser(), $request, new Listing, $this->listingService);
 
         if ($form === true) {
             $this->addFlash('success', 'Successfully added new listing!');
@@ -76,7 +77,7 @@ class ListingController extends AbstractController
 
         $this->authorizationService->denyUnauthorizedUserAccess($listing->getBelongsToUser());
 
-        $form = $this->listingFormHandler->handle($this->getUser(), $request, $listing);
+        $form = $this->entityFormHandler->handle($this->getUser(), $request, $listing, $this->listingService);
 
         if ($form === true) {
             $this->addFlash('success', 'Your listing has been updated!');

@@ -3,9 +3,9 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Listing;
-use App\Form\Handler\ListingFormHandler;
+use App\Form\Handler\EntityFormHandler;
 use App\Repository\ListingRepository;
-use App\Service\AdminService;
+use App\Service\Admin\AdminService;
 use App\Service\Listing\ListingService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,10 +15,10 @@ use Symfony\Component\Routing\Annotation\Route;
 class AdminListingController extends AbstractController
 {
     public function __construct(
-        private readonly ListingRepository  $listingRepository,
-        private readonly ListingFormHandler $listingFormHandler,
-        private readonly ListingService     $listingService,
-        private readonly AdminService       $adminService
+        private readonly ListingRepository $listingRepository,
+        private readonly EntityFormHandler $entityFormHandler,
+        private readonly ListingService    $listingService,
+        private readonly AdminService      $adminService
     )
     {
     }
@@ -53,7 +53,7 @@ class AdminListingController extends AbstractController
     #[Route('/admin/listing/{slug}/edit', name: 'app_admin_edit')]
     public function edit(?Listing $listing, Request $request): Response
     {
-        $form = $this->listingFormHandler->handle($listing->getBelongsToUser(), $request, $listing);
+        $form = $this->entityFormHandler->handle($listing->getBelongsToUser(), $request, $listing, $this->listingService);
 
         if ($form === true) {
             $this->addFlash('success', 'Listing has been updated!');
