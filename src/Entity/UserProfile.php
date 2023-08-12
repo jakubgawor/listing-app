@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Interface\EntityMarkerInterface;
 use App\Repository\UserProfileRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -9,7 +10,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserProfileRepository::class)]
 #[UniqueEntity(fields: 'phone_number', message: 'There is already an account with this phone number')]
-class UserProfile
+class UserProfile implements EntityMarkerInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]

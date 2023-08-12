@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Interface\EntityMarkerInterface;
 use App\Repository\CategoryRepository;
 use App\Traits\SlugTrait;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -11,7 +12,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
 #[UniqueEntity(fields: ['category'], message: 'Category with this name already exists!')]
-class Category
+class Category implements EntityMarkerInterface
 {
     use SlugTrait;
 
