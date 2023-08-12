@@ -2,6 +2,7 @@
 
 namespace App\Tests\Builder;
 
+use App\Entity\Category;
 use App\Entity\Listing;
 use App\Entity\User;
 use App\Entity\UserProfile;
@@ -47,7 +48,7 @@ abstract class EntityBuilder extends WebTestCase implements EntityBuilderInterfa
         return $user;
     }
 
-    public function createListing(string $title, string $description, string $status, User $user): Listing
+    public function createListing(string $title, string $description, string $status, User $user, Category $category): Listing
     {
         $entityManager = self::getContainer()->get('doctrine')->getManager();
 
@@ -56,12 +57,28 @@ abstract class EntityBuilder extends WebTestCase implements EntityBuilderInterfa
             ->setTitle($title)
             ->setDescription($description)
             ->setStatus($status)
-            ->setBelongsToUser($user);
+            ->setBelongsToUser($user)
+            ->setCategory($category);
 
         $entityManager->persist($user->addListing($listing));
         $entityManager->persist($listing);
         $entityManager->flush();
 
         return $listing;
+    }
+
+    public function createCategory(string $categoryName, User $addedBy): Category
+    {
+        $entityManager = self::getContainer()->get('doctrine')->getManager();
+
+        $category = (new Category)
+            ->setCategory($categoryName)
+            ->setAddedBy($addedBy);
+
+        $entityManager->persist($addedBy->addCategory($category));
+        $entityManager->persist($category);
+        $entityManager->flush();
+
+        return $category;
     }
 }

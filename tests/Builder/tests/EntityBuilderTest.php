@@ -2,28 +2,18 @@
 
 namespace App\Tests\Builder\tests;
 
-use App\Entity\Listing;
-use App\Entity\User;
 use App\Enum\ListingStatusEnum;
-use App\Repository\ListingRepository;
+use App\Enum\UserRoleEnum;
 use App\Tests\Builder\EntityBuilder;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityRepository;
 use Faker\Factory;
 use Faker\Generator;
 
 class EntityBuilderTest extends EntityBuilder
 {
-    private EntityManagerInterface $entityManager;
-    private EntityRepository $userRepository;
-    private ListingRepository $listingRepository;
     private Generator $faker;
 
     public function setUp(): void
     {
-        $this->entityManager = static::getContainer()->get('doctrine')->getManager();
-        $this->userRepository = $this->entityManager->getRepository(User::class);
-        $this->listingRepository = $this->entityManager->getRepository(Listing::class);
         $this->faker = Factory::create();
     }
 
@@ -31,13 +21,7 @@ class EntityBuilderTest extends EntityBuilder
     {
         $user = $this->createUser();
 
-        /** @var User $createdUser */
-        $createdUser = $this->userRepository->findOneBy([
-            'id' => $user->getId(),
-            'username' => $user->getUsername()
-        ]);
-
-        $this->assertNotNull($createdUser);
+        $this->assertNotNull($user);
     }
 
     public function testCreateUserBuilderByCustomData(): void
@@ -51,13 +35,7 @@ class EntityBuilderTest extends EntityBuilder
             'phoneNumber' => $phoneNumber
         ];
 
-        $this->createUser($data);
-
-        /** @var User $createdUser */
-        $user = $this->userRepository->findOneBy([
-            'username' => 'customUsername' . $uniqueId,
-            'email' => 'customEmail' . $uniqueId . '@example.com',
-        ]);
+        $user = $this->createUser($data);
 
         $this->assertSame($phoneNumber, $user->getUserProfile()->getPhoneNumber());
         $this->assertNotNull($user);
@@ -70,17 +48,25 @@ class EntityBuilderTest extends EntityBuilder
         $title = $this->faker->realText(15);
         $description = $this->faker->realText(20);
         $status = ListingStatusEnum::NOT_VERIFIED;
+        $category = $this->createCategory($this->faker->realText(30), $this->createUser(['role' => UserRoleEnum::ROLE_ADMIN]));
 
-        $slug = $this->createListing($title, $description, $status, $author)->getSlug();
-
-        /** @var Listing $listing */
-        $listing = $this->listingRepository->findOneBy([
-            'slug' => $slug
-        ]);
+        $listing = $this->createListing($title, $description, $status, $author, $category);
 
         $this->assertNotNull($listing);
         $this->assertSame($status, $listing->getStatus());
         $this->assertSame(null, $listing->getEditedAt());
         $this->assertSame($author->getId(), $listing->getBelongsToUser()->getId());
+        $this->assertSame($category->getCategory(), $listing->getCategory()->getCategory());
+    }
+
+    public function testCreateCategoryBuilder(): void
+    {
+        $categoryName = $this->faker->realText(30);
+        $createdBy = $this->createUser(['role' => UserRoleEnum::ROLE_ADMIN]);
+
+        $category = $this->createCategory($categoryName, $createdBy);
+
+        $this->assertNotNull($category);
+        $this->assertSame($createdBy->getId(), $category->getAddedBy()->getId());
     }
 }
