@@ -2,24 +2,40 @@
 
 namespace App\Service\Listing;
 
+use App\Entity\Interface\EntityMarkerInterface;
 use App\Entity\Listing;
 use App\Entity\User;
 use App\Enum\ListingStatusEnum;
 use App\Enum\UserRoleEnum;
 use App\Exception\UnauthorizedAccessException;
-use App\Service\EmailService;
+use App\Service\Email\EmailService;
+use App\Service\Interface\EntityServiceInterface;
+use App\Traits\EntityCheckerTrait;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 
-class ListingService
+class ListingService implements EntityServiceInterface
 {
+    use EntityCheckerTrait;
+
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly Security $security,
         private readonly EmailService $emailService
     )
     {
+    }
+
+    public function handleEntity(User $user, EntityMarkerInterface $entity): void
+    {
+        $this->checkEntityType($entity, Listing::class);
+
+        if ($entity->getBelongsToUser() === null) {
+            $this->create($entity, $user);
+        } else {
+            $this->edit($entity, $user);
+        }
     }
 
     public function showOne(Listing $listing): Listing

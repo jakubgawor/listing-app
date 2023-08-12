@@ -1,13 +1,18 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\Category;
 
 use App\Entity\Category;
+use App\Entity\Interface\EntityMarkerInterface;
 use App\Entity\User;
+use App\Service\Interface\EntityServiceInterface;
+use App\Traits\EntityCheckerTrait;
 use Doctrine\ORM\EntityManagerInterface;
 
-class CategoryService
+class CategoryService implements EntityServiceInterface
 {
+    use EntityCheckerTrait;
+
     public function __construct(
         private EntityManagerInterface $entityManager,
 
@@ -15,6 +20,16 @@ class CategoryService
     {
     }
 
+    public function handleEntity(User $user, EntityMarkerInterface $entity): void
+    {
+        $this->checkEntityType($entity, Category::class);
+
+        if ($entity->getAddedBy() === null) {
+            $this->createCategory($entity, $user);
+        } else {
+            $this->editCategory($entity);
+        }
+    }
 
     public function createCategory(Category $category, User $user): void
     {
@@ -36,5 +51,6 @@ class CategoryService
         $this->entityManager->remove($category);
         $this->entityManager->flush();
     }
+
 
 }
