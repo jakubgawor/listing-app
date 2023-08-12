@@ -5,28 +5,15 @@ namespace App\Tests\Controller\Admin\Category;
 use App\Entity\Category;
 use App\Enum\UserRoleEnum;
 use App\Tests\Builder\EntityBuilder;
-use Doctrine\ORM\EntityRepository;
-use Faker\Factory;
-use Faker\Generator;
 
 class CreateTest extends EntityBuilder
 {
-    private Generator $faker;
-    private EntityRepository $repository;
-
-    public function setUp(): void
-    {
-        $this->faker = Factory::create();
-        $this->repository = static::getContainer()->get('doctrine')->getManager()->getRepository(Category::class);
-
-        self::ensureKernelShutdown();
-    }
-
     public function testAdminCanCreateNewCategory(): void
     {
         $client = static::createClient();
+        $repository = static::getContainer()->get('doctrine')->getManager()->getRepository(Category::class);
 
-        $categoryName = $this->faker->realText(10) . uniqid();
+        $categoryName = uniqid();
         $admin = $this->createUser(['role' => UserRoleEnum::ROLE_ADMIN]);
 
         $client
@@ -37,7 +24,7 @@ class CreateTest extends EntityBuilder
             'category_form[category]' => $categoryName
         ]);
 
-        $category = $this->repository->findOneBy(['category' => $categoryName]);
+        $category = $repository->findOneBy(['category' => $categoryName]);
 
         $this->assertNotNull($category);
         $this->assertSame($admin->getId(), $category->getAddedBy()->getId());
@@ -48,7 +35,7 @@ class CreateTest extends EntityBuilder
     {
         $client = static::createClient();
 
-        $categoryName = $this->faker->realText(10);
+        $categoryName = uniqid();
 
         $this->createCategory($categoryName, $this->createUser(['role' => UserRoleEnum::ROLE_ADMIN]));
 
