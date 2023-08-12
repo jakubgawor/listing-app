@@ -54,5 +54,39 @@ class AdminCategoryController extends AbstractController
         ]);
     }
 
+    #[Route('/admin/category/{id}/edit', name: 'app_admin_edit_category')]
+    public function editCategory(?Category $category, Request $request): Response
+    {
+        $form = $this->createForm(CategoryFormType::class, $category);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $category = $form->getData();
+
+            $this->entityManager->persist($category);
+            $this->entityManager->persist($category->setAddedBy($this->getUser()));
+
+            $this->entityManager->flush();
+
+            $this->addFlash('success', 'Successfully added new category!');
+            return $this->redirectToRoute('app_admin_categories');
+        }
+
+        return $this->render('admin/category/edit-category.html.twig', [
+            'categoryForm' => $form
+        ]);
+    }
+
+
+    #[Route('/admin/category/{id}/delete', name: 'app_admin_delete_category')]
+    public function deleteCategory(?Category $category): Response
+    {
+        $this->entityManager->remove($category);
+        $this->entityManager->flush();
+
+        $this->addFlash('success', 'Removed category');
+        return $this->redirectToRoute('app_index');
+    }
 
 }
