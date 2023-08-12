@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\Authorization;
 
 use App\Entity\User;
 use App\Exception\UnauthorizedAccessException;
@@ -21,6 +21,5 @@ class AuthorizationService
             throw new UnauthorizedAccessException('You do not have permissions to access this page!', 403);
         }
     }
-
 
 }
