@@ -46,7 +46,7 @@ class Listing
     private ?int $views = 0;
 
     #[ORM\ManyToOne(inversedBy: 'listings')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'cascade')]
     private ?Category $category = null;
 
 
