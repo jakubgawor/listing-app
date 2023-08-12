@@ -20,12 +20,14 @@
             <article class="overflow-hidden rounded-lg shadow-lg">
 
                 <a href="{{ path('app_show_listing', {slug: listing.slug}) }}">
-                    <img alt="{{ listing.title }}" class="block h-auto w-full" src="https://picsum.photos/600/400/?random">
+                    <img alt="{{ listing.title }}" class="block h-auto w-full"
+                         src="https://picsum.photos/600/400/?random">
                 </a>
 
                 <header class="flex items-center justify-between leading-tight p-2 md:p-4">
                     <h1 class="text-lg">
-                        <a class="no-underline hover:underline text-black" href="{{ path('app_show_listing', {slug: listing.slug}) }}">
+                        <a class="no-underline hover:underline text-black"
+                           href="{{ path('app_show_listing', {slug: listing.slug}) }}">
                             {{ listing.title }}
                         </a>
                     </h1>
@@ -34,16 +36,17 @@
                     </p>
                 </header>
 
+
                 <footer class="flex items-center justify-between leading-none p-2 md:p-4">
-                    <a class="flex items-center no-underline hover:underline text-black" href="{{ path('app_user_profile', { username: listing.belongsToUser.userIdentifier }) }}">
+                    <a class="flex items-center no-underline hover:underline text-black"
+                       href="{{ path('app_user_profile', { username: listing.belongsToUser.userIdentifier }) }}">
                         <img alt="Placeholder" class="block rounded-full" src="https://picsum.photos/32/32/?random">
                         <p class="ml-2 text-sm">
                             {{ listing.belongsToUser.username }}
                         </p>
                     </a>
-                    <a class="no-underline text-grey-darker hover:text-red-dark" href="#">
-                        <span class="hidden">Like</span>
-                        <i class="fa fa-heart"></i>
+                    <a class="no-underline text-grey-darker text-xs" href="#">
+                        {{ listing.category.category }}
                     </a>
                 </footer>
 
