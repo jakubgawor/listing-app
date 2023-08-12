@@ -27,7 +27,7 @@ class EntityBuilderTest extends EntityBuilder
     public function testCreateUserBuilderByCustomData(): void
     {
         $uniqueId = uniqid();
-        $phoneNumber = (string) random_int(111111111, 999999999);
+        $phoneNumber = (string)random_int(111111111, 999999999);
 
         $data = [
             'username' => 'customUsername' . $uniqueId,
@@ -48,7 +48,10 @@ class EntityBuilderTest extends EntityBuilder
         $title = $this->faker->realText(15);
         $description = $this->faker->realText(20);
         $status = ListingStatusEnum::NOT_VERIFIED;
-        $category = $this->createCategory($this->faker->realText(30), $this->createUser(['role' => UserRoleEnum::ROLE_ADMIN]));
+        $category = $this->createCategory(
+            $this->faker->realText(10) . uniqid(),
+            $this->createUser(['role' => UserRoleEnum::ROLE_ADMIN])
+        );
 
         $listing = $this->createListing($title, $description, $status, $author, $category);
 
@@ -61,7 +64,7 @@ class EntityBuilderTest extends EntityBuilder
 
     public function testCreateCategoryBuilder(): void
     {
-        $categoryName = $this->faker->realText(30);
+        $categoryName = $this->faker->realText(10) . uniqid();
         $createdBy = $this->createUser(['role' => UserRoleEnum::ROLE_ADMIN]);
 
         $category = $this->createCategory($categoryName, $createdBy);
