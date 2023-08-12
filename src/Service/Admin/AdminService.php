@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\Admin;
 
 use App\Entity\Listing;
 use App\Entity\User;
@@ -10,6 +10,7 @@ use App\Exception\AdminDegradationException;
 use App\Exception\AdminPromotionException;
 use App\Exception\BanUserException;
 use App\Exception\RepeatedVerificationException;
+use App\Service\Email\EmailService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 
