@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\Email;
 
 use App\Entity\Listing;
 use App\Entity\User;
