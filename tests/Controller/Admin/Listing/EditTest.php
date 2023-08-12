@@ -35,7 +35,9 @@ class EditTest extends EntityBuilder
             $this->faker->realText(15),
             $this->faker->realText(20),
             ListingStatusEnum::VERIFIED,
-            $author);
+            $author,
+            $this->createCategory(uniqid(), $this->createUser())
+        );
 
         $oldSlug = $listing->getSlug();
 

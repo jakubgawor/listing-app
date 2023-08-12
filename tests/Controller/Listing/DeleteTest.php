@@ -28,7 +28,13 @@ class DeleteTest extends EntityBuilder
         $user = $this->createUser();
         $client->loginUser($user);
 
-        $listing = $this->createListing($this->faker->realText(15), $this->faker->realText(20), ListingStatusEnum::VERIFIED, $user);
+        $listing = $this->createListing(
+            $this->faker->realText(15),
+            $this->faker->realText(20),
+            ListingStatusEnum::VERIFIED,
+            $user,
+            $this->createCategory(uniqid(), $this->createUser())
+        );
 
         $client->request('GET', '/listing/' . $listing->getSlug() . '/delete');
 
@@ -41,7 +47,13 @@ class DeleteTest extends EntityBuilder
         $user = $this->createUser();
         $client->loginUser($user);
 
-        $listing = $this->createListing($this->faker->realText(15), $this->faker->realText(20), ListingStatusEnum::NOT_VERIFIED, $user);
+        $listing = $this->createListing(
+            $this->faker->realText(15),
+            $this->faker->realText(20),
+            ListingStatusEnum::NOT_VERIFIED,
+            $user,
+            $this->createCategory(uniqid(), $this->createUser())
+        );
 
         $client->request('GET', '/listing/' . $listing->getSlug() . '/delete');
 
@@ -54,7 +66,13 @@ class DeleteTest extends EntityBuilder
         $author = $this->createUser();
         $client->loginUser($author);
 
-        $listing = $this->createListing($this->faker->realText(15), $this->faker->realText(20), ListingStatusEnum::VERIFIED, $this->createUser());
+        $listing = $this->createListing(
+            $this->faker->realText(15),
+            $this->faker->realText(20),
+            ListingStatusEnum::VERIFIED,
+            $this->createUser(),
+            $this->createCategory(uniqid(), $this->createUser())
+        );
 
         $client->request('GET', '/listing/' . $listing->getSlug() . '/delete');
 
@@ -65,7 +83,13 @@ class DeleteTest extends EntityBuilder
     {
         $client = static::createClient();
 
-        $listing = $this->createListing($this->faker->realText(20), $this->faker->realText(50), ListingStatusEnum::VERIFIED, $this->createUser());
+        $listing = $this->createListing(
+            $this->faker->realText(20),
+            $this->faker->realText(50),
+            ListingStatusEnum::VERIFIED,
+            $this->createUser(),
+            $this->createCategory(uniqid(), $this->createUser())
+        );
 
         $client->request('GET', '/listing/' . $listing->getSlug() . '/delete');
 

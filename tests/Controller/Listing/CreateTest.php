@@ -59,9 +59,16 @@ class CreateTest extends EntityBuilder
 
         $title = $this->faker->realText(10);
         $description = $this->faker->realText(15);
+        $category = $this->createCategory(uniqid(), $this->createUser());
 
-        $existingListing = $this->createListing($title, $description, ListingStatusEnum::VERIFIED, $this->createUser());
-        $listing = $this->createListing($title, $description, ListingStatusEnum::VERIFIED, $user);
+        $existingListing = $this->createListing(
+            $title,
+            $description,
+            ListingStatusEnum::VERIFIED,
+            $this->createUser(),
+            $category
+        );
+        $listing = $this->createListing($title, $description, ListingStatusEnum::VERIFIED, $user, $category);
 
         $this->assertNotNull($this->repository->findOneBy(['slug' => $listing->getSlug()]));
         $this->assertNotSame($existingListing->getSlug(), $listing->getSlug());

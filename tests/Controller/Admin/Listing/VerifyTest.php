@@ -62,7 +62,8 @@ class VerifyTest extends EntityBuilder
             $this->faker->realText(10),
             $this->faker->realText(15),
             $status,
-            $this->createUser()
+            $this->createUser(),
+            $this->createCategory(uniqid(), $this->createUser())
         );
     }
 

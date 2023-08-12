@@ -23,7 +23,13 @@ class AccessTest extends EntityBuilder
     {
         $client = static::createClient();
         $author = $this->createUser();
-        $listing = $this->createListing($this->faker->realText(15), $this->faker->realText(20), ListingStatusEnum::VERIFIED, $author);
+        $listing = $this->createListing(
+            $this->faker->realText(15),
+            $this->faker->realText(20),
+            ListingStatusEnum::VERIFIED,
+            $author,
+            $this->createCategory(uniqid(), $this->createUser())
+        );
 
         $client->request('GET', '/listing/' . $listing->getSlug());
 
@@ -34,7 +40,13 @@ class AccessTest extends EntityBuilder
     {
         $client = static::createClient();
         $author = $this->createUser();
-        $listing = $this->createListing($this->faker->realText(15), $this->faker->realText(20), ListingStatusEnum::NOT_VERIFIED, $author);
+        $listing = $this->createListing(
+            $this->faker->realText(15),
+            $this->faker->realText(20),
+            ListingStatusEnum::NOT_VERIFIED,
+            $author,
+            $this->createCategory(uniqid(), $this->createUser())
+        );
 
         $client->request('GET', '/listing/' . $listing->getSlug());
 
@@ -93,7 +105,13 @@ class AccessTest extends EntityBuilder
     {
         $client = static::createClient();
         $user = $this->createUser();
-        $listing = $this->createListing($this->faker->realText(15), $this->faker->realText(20), ListingStatusEnum::VERIFIED, $user);
+        $listing = $this->createListing(
+            $this->faker->realText(15),
+            $this->faker->realText(20),
+            ListingStatusEnum::VERIFIED,
+            $user,
+            $this->createCategory(uniqid(), $this->createUser())
+        );
         $client->loginUser($user);
 
         $client->request('GET', '/listing/' . $listing->getSlug() . '/edit');
@@ -105,7 +123,13 @@ class AccessTest extends EntityBuilder
     {
         $client = static::createClient();
         $user = $this->createUser();
-        $listing = $this->createListing($this->faker->realText(15), $this->faker->realText(20), ListingStatusEnum::NOT_VERIFIED, $user);
+        $listing = $this->createListing(
+            $this->faker->realText(15),
+            $this->faker->realText(20),
+            ListingStatusEnum::NOT_VERIFIED,
+            $user,
+            $this->createCategory(uniqid(), $this->createUser())
+        );
         $client->loginUser($user);
 
         $client->request('GET', '/listing/' . $listing->getSlug() . '/edit');
@@ -117,7 +141,13 @@ class AccessTest extends EntityBuilder
     {
         $client = static::createClient();
         $owner = $this->createUser();
-        $listing = $this->createListing($this->faker->realText(15), $this->faker->realText(20), ListingStatusEnum::VERIFIED, $owner);
+        $listing = $this->createListing(
+            $this->faker->realText(15),
+            $this->faker->realText(20),
+            ListingStatusEnum::VERIFIED,
+            $owner,
+            $this->createCategory(uniqid(), $this->createUser())
+        );
         $client->loginUser($this->createUser());
 
         $client->request('GET', '/listing/' . $listing->getSlug() . '/edit');
@@ -132,7 +162,13 @@ class AccessTest extends EntityBuilder
             'role' => UserRoleEnum::ROLE_USER,
             'isVerified' => false
         ]);
-        $listing = $this->createListing($this->faker->realText(15), $this->faker->realText(20), ListingStatusEnum::VERIFIED, $user);
+        $listing = $this->createListing(
+            $this->faker->realText(15),
+            $this->faker->realText(20),
+            ListingStatusEnum::VERIFIED,
+            $user,
+            $this->createCategory(uniqid(), $this->createUser())
+        );
         $client->loginUser($user);
 
         $client->request('GET', '/listing/' . $listing->getSlug() . '/edit');
@@ -143,7 +179,13 @@ class AccessTest extends EntityBuilder
     public function testEditListingPageCanNotBeRenderedIfTheUserIsNotLoggedIn(): void
     {
         $client = static::createClient();
-        $listing = $this->createListing($this->faker->realText(15), $this->faker->realText(20), ListingStatusEnum::VERIFIED, $this->createUser());
+        $listing = $this->createListing(
+            $this->faker->realText(15),
+            $this->faker->realText(20),
+            ListingStatusEnum::VERIFIED,
+            $this->createUser(),
+            $this->createCategory(uniqid(), $this->createUser())
+        );
 
         $client->request('GET', '/listing/' . $listing->getSlug() . '/edit');
 

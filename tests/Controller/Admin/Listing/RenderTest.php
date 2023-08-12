@@ -51,7 +51,8 @@ class RenderTest extends EntityBuilder
                     'testListing',
                     'testListing',
                     $listingStatus,
-                    $this->createUser()
+                    $this->createUser(),
+                    $this->createCategory(uniqid(), $this->createUser())
                 )->getSlug() . $additionalUri
             );
     }

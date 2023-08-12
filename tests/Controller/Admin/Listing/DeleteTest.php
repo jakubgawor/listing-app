@@ -32,7 +32,8 @@ class DeleteTest extends EntityBuilder
             $this->faker->realText(10),
             $this->faker->realText(15),
             ListingStatusEnum::VERIFIED,
-            $this->createUser()
+            $this->createUser(),
+            $this->createCategory(uniqid(), $this->createUser())
         );
 
         $this->client->request('GET', '/admin/listing/' . $listing->getSlug() . '/delete');

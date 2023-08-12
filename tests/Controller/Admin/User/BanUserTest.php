@@ -23,8 +23,10 @@ class BanUserTest extends EntityBuilder
     {
         $client = static::createClient()->loginUser($this->createUser(['role' => UserRoleEnum::ROLE_ADMIN]));
         $user = $this->createUser();
-        $firstListing = $this->createListing('Title', 'Description', ListingStatusEnum::VERIFIED, $user);
-        $secondListing = $this->createListing('Title', 'Description', ListingStatusEnum::VERIFIED, $user);
+
+        $category = $this->createCategory(uniqid(), $this->createUser());
+        $firstListing = $this->createListing('Title', 'Description', ListingStatusEnum::VERIFIED, $user, $category);
+        $secondListing = $this->createListing('Title', 'Description', ListingStatusEnum::VERIFIED, $user, $category);
 
         $client->request('GET', '/admin/user/' . $user->getUsername() . '/ban');
 
