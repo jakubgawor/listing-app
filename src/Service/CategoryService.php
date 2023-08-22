@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service\Category;
+namespace App\Service;
 
 use App\Entity\Category;
 use App\Entity\Interface\EntityMarkerInterface;

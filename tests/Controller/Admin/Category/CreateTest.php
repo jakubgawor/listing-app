@@ -5,22 +5,37 @@ namespace App\Tests\Controller\Admin\Category;
 use App\Entity\Category;
 use App\Enum\UserRoleEnum;
 use App\Tests\Builder\EntityBuilder;
+use Doctrine\ORM\EntityManager;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
 class CreateTest extends EntityBuilder
 {
+    private KernelBrowser $client;
+    private EntityManager $entityManager;
+
+    protected function setUp(): void
+    {
+
+        $this->client = static::createClient();
+
+        $this->entityManager = static::getContainer()->get('doctrine')->getManager();
+
+    }
+
     public function testAdminCanCreateNewCategory(): void
     {
-        $client = static::createClient();
-        $repository = static::getContainer()->get('doctrine')->getManager()->getRepository(Category::class);
+//        $repository = static::getContainer()->get('doctrine')->getManager()->getRepository(Category::class);
+        $repository = $this->entityManager->getRepository(Category::class);
+
 
         $categoryName = uniqid();
         $admin = $this->createUser(['role' => UserRoleEnum::ROLE_ADMIN]);
 
-        $client
+        $this->client
             ->loginUser($admin)
             ->request('GET', '/admin/create-category');
 
-        $client->submitForm('Submit', [
+        $this->client->submitForm('Submit', [
             'category_form[category]' => $categoryName
         ]);
 
@@ -33,20 +48,19 @@ class CreateTest extends EntityBuilder
 
     public function testAdminCanNotCreateCategoryWithNameOfExistingCategory(): void
     {
-        $client = static::createClient();
-
         $categoryName = uniqid();
 
         $this->createCategory($categoryName, $this->createUser(['role' => UserRoleEnum::ROLE_ADMIN]));
 
-        $client
+        $this->client
             ->loginUser($this->createUser(['role' => UserRoleEnum::ROLE_ADMIN]))
             ->request('GET', '/admin/create-category');
 
-        $client->submitForm('Submit', [
+        $this->client->submitForm('Submit', [
             'category_form[category]' => $categoryName
         ]);
 
         $this->assertResponseIsUnprocessable();
     }
+
 }

@@ -16,6 +16,11 @@ class Listing implements EntityMarkerInterface
 {
     use SlugTrait;
 
+    public function __construct()
+    {
+        $this->created_at = new \DateTime();
+    }
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -50,12 +55,10 @@ class Listing implements EntityMarkerInterface
     #[ORM\JoinColumn(nullable: false, onDelete: 'cascade')]
     private ?Category $category = null;
 
-
     #[ORM\PrePersist]
     public function setInitialValues(): void
     {
         $this->slug = $this->createSlug($this->title);
-        $this->created_at = new \DateTime();
         $this->edited_at = null;
     }
 

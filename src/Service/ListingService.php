@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service\Listing;
+namespace App\Service;
 
 use App\Entity\Interface\EntityMarkerInterface;
 use App\Entity\Listing;
@@ -8,7 +8,6 @@ use App\Entity\User;
 use App\Enum\ListingStatusEnum;
 use App\Enum\UserRoleEnum;
 use App\Exception\UnauthorizedAccessException;
-use App\Service\Email\EmailService;
 use App\Service\Interface\EntityServiceInterface;
 use App\Traits\EntityCheckerTrait;
 use DateTime;

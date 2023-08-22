@@ -5,7 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\Category;
 use App\Form\Handler\EntityFormHandler;
 use App\Repository\CategoryRepository;
-use App\Service\Category\CategoryService;
+use App\Service\CategoryService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

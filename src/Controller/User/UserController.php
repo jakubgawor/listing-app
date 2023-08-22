@@ -4,8 +4,8 @@ namespace App\Controller\User;
 
 use App\Entity\User;
 use App\Enum\UserRoleEnum;
-use App\Service\Authorization\AuthorizationService;
-use App\Service\User\UserService;
+use App\Service\AuthorizationService;
+use App\Service\UserService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -20,7 +20,7 @@ class UserController extends AbstractController
     {
     }
 
-    #[Route('/user/{username}/delete', name: 'app_user_profile_delete', methods: 'GET')]
+    #[Route('/user/{username}/delete', name: 'app_user_delete', methods: 'GET')]
     #[IsGranted(UserRoleEnum::ROLE_USER_EMAIL_VERIFIED)]
     public function delete(?User $user): Response
     {
@@ -30,4 +30,5 @@ class UserController extends AbstractController
         $this->addFlash('success', 'Your profile has been deleted!');
         return $this->redirectToRoute('app_index');
     }
+
 }
