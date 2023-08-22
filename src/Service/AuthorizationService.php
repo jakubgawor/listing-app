@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service\Authorization;
+namespace App\Service;
 
 use App\Entity\User;
 use App\Exception\UnauthorizedAccessException;
@@ -19,6 +19,13 @@ class AuthorizationService
     {
         if (!$this->authorizationChecker->isGranted(SameUsernameVoter::IS_SAME_USER, $user->getUserIdentifier())) {
             throw new UnauthorizedAccessException('You do not have permissions to access this page!', 403);
+        }
+    }
+
+    public function denyLoggedUserAccess(?User $user): void
+    {
+        if ($user) {
+            throw new UnauthorizedAccessException('You are already logged in!', 403);
         }
     }
 
