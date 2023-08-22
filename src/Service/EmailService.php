@@ -1,13 +1,16 @@
 <?php
 
-namespace App\Service\Email;
+namespace App\Service;
 
 use App\Entity\Listing;
 use App\Entity\User;
 use App\Message\SendEmailNotification;
 use App\Repository\UserRepository;
+use App\Security\EmailVerifier;
 use App\Service\Config\AppConfig;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Mime\Address;
 use Twig\Environment;
 
 class EmailService
@@ -16,7 +19,8 @@ class EmailService
         private MessageBusInterface $bus,
         private UserRepository      $userRepository,
         private Environment         $twig,
-        private AppConfig           $appConfig
+        private AppConfig           $appConfig,
+        private EmailVerifier       $emailVerifier
     )
     {
     }
@@ -43,5 +47,16 @@ class EmailService
         ]);
 
         $this->bus->dispatch(new SendEmailNotification([$user->getEmail()], 'Listing ' . $listing->getTitle() . ' has been verified!', $message));
+    }
+
+    public function sendRegistrationEmailConfirmation(User $user): void
+    {
+        $this->emailVerifier->sendEmailConfirmation('app_verify_email', $user,
+            (new TemplatedEmail())
+                ->from(new Address('mailer@listing-app.com', 'Listing App'))
+                ->to($user->getEmail())
+                ->subject('Please Confirm your Email')
+                ->htmlTemplate('registration/confirmation_email.html.twig')
+        );
     }
 }
