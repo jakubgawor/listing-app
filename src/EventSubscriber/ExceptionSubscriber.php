@@ -9,6 +9,8 @@ use App\Exception\BanUserException;
 use App\Exception\RepeatedVerificationException;
 use App\Exception\UnauthorizedAccessException;
 use App\Exception\ObjectNotFoundException;
+use App\Exception\UserNotRegisteredException;
+use App\Exception\VerifyEmailException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -27,7 +29,9 @@ class ExceptionSubscriber implements EventSubscriberInterface
             AdminPromotionException::class => ['flashType' => 'notification', 'path' => '/'],
             AdminDegradationException::class => ['flashType' => 'notification', 'path' => '/'],
             ObjectNotFoundException::class => ['flashType' => 'error', 'path' => '/'],
-            BanUserException::class => ['flashType' => 'error', 'path' => '/']
+            BanUserException::class => ['flashType' => 'error', 'path' => '/'],
+            UserNotRegisteredException::class => ['flashType' => 'notification', 'path' => '/register'],
+            VerifyEmailException::class => ['flashType' => 'error', 'path' => '/']
         ];
 
         foreach ($exceptionClassMap as $exceptionClass => $details) {
