@@ -6,7 +6,6 @@ use App\Entity\Listing;
 use App\Enum\ListingStatusEnum;
 use App\Enum\UserRoleEnum;
 use App\Form\Handler\EntityFormHandler;
-use App\Form\Handler\ListingFormHandler;
 use App\Repository\ListingRepository;
 use App\Service\AuthorizationService;
 use App\Service\ListingService;

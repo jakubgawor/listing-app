@@ -9,6 +9,7 @@ use App\Entity\User;
 use App\Entity\UserProfile;
 use App\Form\Type\CategoryFormType;
 use App\Form\Type\ListingFormType;
+use App\Form\Type\RegistrationFormType;
 use App\Form\Type\UserProfileFormType;
 use App\Service\Interface\EntityServiceInterface;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -33,7 +34,11 @@ class EntityFormHandler
         if ($form->isSubmitted() && $form->isValid()) {
             $entity = $form->getData();
 
-            $entityService->handleEntity($user, $entity);
+            if ($formTypeClass === RegistrationFormType::class) {
+                $entityService->registerUser($user, $form->get('plainPassword')->getData());
+            } else {
+                $entityService->handleEntity($user, $entity);
+            }
 
             return true;
         }
@@ -53,6 +58,10 @@ class EntityFormHandler
 
         if ($entity instanceof UserProfile) {
             return UserProfileFormType::class;
+        }
+
+        if ($entity instanceof User) {
+            return RegistrationFormType::class;
         }
 
         throw new \InvalidArgumentException('Unsupported entity type');
