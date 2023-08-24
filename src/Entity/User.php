@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Entity\Interface\EntityMarkerInterface;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -16,7 +15,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[UniqueEntity(fields: ['username'], message: 'There is already an account with this username')]
 #[UniqueEntity(fields: ['email'], message: 'There is already an account with this email address')]
-class User implements UserInterface, PasswordAuthenticatedUserInterface, EntityMarkerInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     public function __construct()
     {

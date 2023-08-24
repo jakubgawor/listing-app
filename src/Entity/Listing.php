@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Entity\Interface\EntityMarkerInterface;
 use App\Enum\ListingStatusEnum;
 use App\Repository\ListingRepository;
 use App\Traits\SlugTrait;
@@ -12,7 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ListingRepository::class)]
 #[ORM\HasLifecycleCallbacks]
-class Listing implements EntityMarkerInterface
+class Listing
 {
     use SlugTrait;
 
