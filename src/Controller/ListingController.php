@@ -63,7 +63,7 @@ class ListingController extends AbstractController
     #[IsGranted(UserRoleEnum::ROLE_USER_EMAIL_VERIFIED)]
     public function edit(?Listing $listing, Request $request): Response
     {
-        $this->authorizationService->denyUserAccessToNotVerfiedListings($listing);
+        $this->authorizationService->denyUserAccessToNotVerifiedListings($listing);
         $this->authorizationService->denyUnauthorizedUserAccess($listing->getBelongsToUser());
 
         $form = $this->listingFormHandler->handle($request, $this->getUser(), $listing);
@@ -82,7 +82,7 @@ class ListingController extends AbstractController
     #[IsGranted(UserRoleEnum::ROLE_USER_EMAIL_VERIFIED)]
     public function delete(?Listing $listing): Response
     {
-        $this->authorizationService->denyUserAccessToNotVerfiedListings($listing);
+        $this->authorizationService->denyUserAccessToNotVerifiedListings($listing);
         $this->authorizationService->denyUnauthorizedUserAccess($listing->getBelongsToUser());
         $this->listingService->deleteListing($listing);
 
