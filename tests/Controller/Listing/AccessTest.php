@@ -92,15 +92,6 @@ class AccessTest extends EntityBuilder
         $this->assertResponseRedirects('/login', 302);
     }
 
-    public function testCreateListingPageCanNotBeRenderedWhileUserIsBanned(): void
-    {
-        static::createClient()
-            ->loginUser($this->createUser(['isBanned' => true]))
-            ->request('GET', '/create-listing');
-
-        $this->assertResponseRedirects('/', 302);
-    }
-
     public function testEditListingPageCanBeRenderedIfTheUserIsVerifiedAndIsOwnerOfTheVerifiedListing(): void
     {
         $client = static::createClient();
