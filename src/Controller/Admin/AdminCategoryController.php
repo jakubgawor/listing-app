@@ -3,7 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Category;
-use App\Form\Handler\EntityFormHandler;
+use App\Form\Handler\CategoryFormHandler;
 use App\Repository\CategoryRepository;
 use App\Service\CategoryService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -14,9 +14,9 @@ use Symfony\Component\Routing\Annotation\Route;
 class AdminCategoryController extends AbstractController
 {
     public function __construct(
-        private readonly CategoryRepository $categoryRepository,
-        private readonly EntityFormHandler  $entityFormHandler,
-        private readonly CategoryService    $categoryService
+        private readonly CategoryRepository  $categoryRepository,
+        private readonly CategoryService     $categoryService,
+        private readonly CategoryFormHandler $categoryFormHandler,
     )
     {
     }
@@ -32,7 +32,7 @@ class AdminCategoryController extends AbstractController
     #[Route('/admin/create-category', name: 'app_admin_create_category')]
     public function addCategory(Request $request): Response
     {
-        $form = $this->entityFormHandler->handle($this->getUser(), $request, new Category, $this->categoryService);
+        $form = $this->categoryFormHandler->handle($request, $this->getUser(), new Category);
 
         if ($form === true) {
             $this->addFlash('success', 'Successfully added new category!');
@@ -47,7 +47,7 @@ class AdminCategoryController extends AbstractController
     #[Route('/admin/category/{id}/edit', name: 'app_admin_edit_category')]
     public function editCategory(?Category $category, Request $request): Response
     {
-        $form = $this->entityFormHandler->handle($this->getUser(), $request, $category, $this->categoryService);
+        $form = $this->categoryFormHandler->handle($request, $this->getUser(), $category);
 
         if ($form === true) {
             $this->addFlash('success', 'Successfully edited category!');
