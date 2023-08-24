@@ -16,6 +16,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\PasswordHasher\Exception\InvalidPasswordException;
 
 class ExceptionSubscriber implements EventSubscriberInterface
 {
@@ -34,6 +35,7 @@ class ExceptionSubscriber implements EventSubscriberInterface
             UserNotRegisteredException::class => ['flashType' => 'notification', 'path' => '/register'],
             VerifyEmailException::class => ['flashType' => 'error', 'path' => '/'],
             NotVerifiedListingException::class => ['flashType' => 'error', 'path' => '/'],
+            InvalidPasswordException::class => ['flashType' => 'error', 'path' => '/'],
         ];
 
         foreach ($exceptionClassMap as $exceptionClass => $details) {
