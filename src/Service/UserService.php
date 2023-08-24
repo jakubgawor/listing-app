@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service\User;
+namespace App\Service;
 
 use App\Entity\User;
 use App\Enum\UserRoleEnum;
@@ -12,7 +12,8 @@ class UserService
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
-        private readonly TokenStorageInterface  $tokenStorage
+        private readonly TokenStorageInterface  $tokenStorage,
+        private readonly EmailService           $emailService
     )
     {
     }
@@ -29,6 +30,18 @@ class UserService
         $this->tokenStorage->setToken(null);
 
         $this->entityManager->flush();
+    }
+
+    public function changeEmail(User $user): void
+    {
+        $user
+            ->setIsVerified(false)
+            ->setRoles([UserRoleEnum::ROLE_USER]);
+
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+
+        $this->emailService->sendRegistrationEmailConfirmation($user);
     }
 
 }
