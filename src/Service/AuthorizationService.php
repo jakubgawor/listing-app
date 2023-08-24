@@ -2,7 +2,10 @@
 
 namespace App\Service;
 
+use App\Entity\Listing;
 use App\Entity\User;
+use App\Enum\ListingStatusEnum;
+use App\Exception\NotVerifiedListingException;
 use App\Exception\UnauthorizedAccessException;
 use App\Security\Voter\SameUsernameVoter;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -26,6 +29,13 @@ class AuthorizationService
     {
         if ($user) {
             throw new UnauthorizedAccessException('You are already logged in!', 403);
+        }
+    }
+
+    public function denyUserAccessToNotVerifiedListings(Listing $listing): void
+    {
+        if ($listing->getStatus() === ListingStatusEnum::NOT_VERIFIED) {
+            throw new NotVerifiedListingException('This listing is not verified!');
         }
     }
 
