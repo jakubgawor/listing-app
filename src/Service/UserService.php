@@ -2,18 +2,22 @@
 
 namespace App\Service;
 
+use App\DTO\ChangePasswordDTO;
 use App\Entity\User;
 use App\Enum\UserRoleEnum;
 use App\Exception\AdminDeletionException;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\PasswordHasher\Exception\InvalidPasswordException;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class UserService
 {
     public function __construct(
-        private readonly EntityManagerInterface $entityManager,
-        private readonly TokenStorageInterface  $tokenStorage,
-        private readonly EmailService           $emailService
+        private readonly EntityManagerInterface      $entityManager,
+        private readonly TokenStorageInterface       $tokenStorage,
+        private readonly EmailService                $emailService,
+        private readonly UserPasswordHasherInterface $userPasswordHasher,
     )
     {
     }
@@ -44,4 +48,15 @@ class UserService
         $this->emailService->sendRegistrationEmailConfirmation($user);
     }
 
+    public function changePassword(User $user, ChangePasswordDTO $changePasswordDTO): void
+    {
+        if (!$this->userPasswordHasher->isPasswordValid($user, $changePasswordDTO->getOldPassword())) {
+            throw new InvalidPasswordException();
+        }
+
+        $user->setPassword($this->userPasswordHasher->hashPassword($user, $changePasswordDTO->getNewPassword()));
+
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+    }
 }
