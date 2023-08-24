@@ -6,6 +6,7 @@ use App\Exception\AdminDegradationException;
 use App\Exception\AdminDeletionException;
 use App\Exception\AdminPromotionException;
 use App\Exception\BanUserException;
+use App\Exception\NotVerifiedListingException;
 use App\Exception\RepeatedVerificationException;
 use App\Exception\UnauthorizedAccessException;
 use App\Exception\ObjectNotFoundException;
@@ -31,7 +32,8 @@ class ExceptionSubscriber implements EventSubscriberInterface
             ObjectNotFoundException::class => ['flashType' => 'error', 'path' => '/'],
             BanUserException::class => ['flashType' => 'error', 'path' => '/'],
             UserNotRegisteredException::class => ['flashType' => 'notification', 'path' => '/register'],
-            VerifyEmailException::class => ['flashType' => 'error', 'path' => '/']
+            VerifyEmailException::class => ['flashType' => 'error', 'path' => '/'],
+            NotVerifiedListingException::class => ['flashType' => 'error', 'path' => '/'],
         ];
 
         foreach ($exceptionClassMap as $exceptionClass => $details) {
