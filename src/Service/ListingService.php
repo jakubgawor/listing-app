@@ -44,9 +44,9 @@ class ListingService
             $this->entityManager->persist($listing->setStatus(ListingStatusEnum::VERIFIED));
         }
 
+        $this->entityManager->persist($listing->setBelongsToUser($user));
         $this->emailService->notifyAdminAboutNewListing($listing->getSlug());
 
-        $this->entityManager->persist($listing->setBelongsToUser($user));
         $this->entityManager->flush();
     }
 
