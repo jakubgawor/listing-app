@@ -3,9 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\Listing;
-use App\Enum\ListingStatusEnum;
 use App\Enum\UserRoleEnum;
-use App\Form\Handler\EntityFormHandler;
+use App\Form\Handler\ListingFormHandler;
 use App\Repository\ListingRepository;
 use App\Service\AuthorizationService;
 use App\Service\ListingService;
@@ -19,9 +18,9 @@ class ListingController extends AbstractController
 {
     public function __construct(
         private readonly ListingRepository    $listingRepository,
-        private readonly EntityFormHandler    $entityFormHandler,
         private readonly AuthorizationService $authorizationService,
-        private readonly ListingService       $listingService
+        private readonly ListingService       $listingService,
+        private readonly ListingFormHandler   $listingFormHandler,
     )
     {
     }
@@ -48,12 +47,7 @@ class ListingController extends AbstractController
     #[IsGranted(UserRoleEnum::ROLE_USER_EMAIL_VERIFIED)]
     public function create(Request $request): Response
     {
-        if ($this->getUser()->isBanned()) {
-            $this->addFlash('error', 'You are banned');
-            return $this->redirectToRoute('app_index');
-        }
-
-        $form = $this->entityFormHandler->handle($this->getUser(), $request, new Listing, $this->listingService);
+        $form = $this->listingFormHandler->handle($request, $this->getUser(), new Listing);
 
         if ($form === true) {
             $this->addFlash('success', 'Successfully added new listing!');
@@ -69,14 +63,10 @@ class ListingController extends AbstractController
     #[IsGranted(UserRoleEnum::ROLE_USER_EMAIL_VERIFIED)]
     public function edit(?Listing $listing, Request $request): Response
     {
-        if ($listing->getStatus() === ListingStatusEnum::NOT_VERIFIED) {
-            $this->addFlash('notification', 'This listing is not verified!');
-            return $this->redirectToRoute('app_index');
-        }
-
+        $this->authorizationService->denyUserAccessToNotVerfiedListings($listing);
         $this->authorizationService->denyUnauthorizedUserAccess($listing->getBelongsToUser());
 
-        $form = $this->entityFormHandler->handle($this->getUser(), $request, $listing, $this->listingService);
+        $form = $this->listingFormHandler->handle($request, $this->getUser(), $listing);
 
         if ($form === true) {
             $this->addFlash('success', 'Your listing has been updated!');
@@ -92,11 +82,7 @@ class ListingController extends AbstractController
     #[IsGranted(UserRoleEnum::ROLE_USER_EMAIL_VERIFIED)]
     public function delete(?Listing $listing): Response
     {
-        if ($listing->getStatus() === ListingStatusEnum::NOT_VERIFIED) {
-            $this->addFlash('notification', 'This listing is not verified!');
-            return $this->redirectToRoute('app_index');
-        }
-
+        $this->authorizationService->denyUserAccessToNotVerfiedListings($listing);
         $this->authorizationService->denyUnauthorizedUserAccess($listing->getBelongsToUser());
         $this->listingService->deleteListing($listing);
 
