@@ -2,39 +2,24 @@
 
 namespace App\Service;
 
-use App\Entity\Interface\EntityMarkerInterface;
 use App\Entity\Listing;
 use App\Entity\User;
 use App\Enum\ListingStatusEnum;
 use App\Enum\UserRoleEnum;
+use App\Exception\BanUserException;
 use App\Exception\UnauthorizedAccessException;
-use App\Service\Interface\EntityServiceInterface;
-use App\Traits\EntityCheckerTrait;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 
-class ListingService implements EntityServiceInterface
+class ListingService
 {
-    use EntityCheckerTrait;
-
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly Security $security,
         private readonly EmailService $emailService
     )
     {
-    }
-
-    public function handleEntity(User $user, EntityMarkerInterface $entity): void
-    {
-        $this->checkEntityType($entity, Listing::class);
-
-        if ($entity->getBelongsToUser() === null) {
-            $this->create($entity, $user);
-        } else {
-            $this->edit($entity, $user);
-        }
     }
 
     public function showOne(Listing $listing): Listing
@@ -51,14 +36,17 @@ class ListingService implements EntityServiceInterface
 
     public function create(Listing $listing, User $user): void
     {
+        if($user->isBanned()) {
+            throw new BanUserException('You are banned!');
+        }
+
         if (in_array(UserRoleEnum::ROLE_ADMIN, $user->getRoles())) {
             $this->entityManager->persist($listing->setStatus(ListingStatusEnum::VERIFIED));
         }
 
-        $this->entityManager->persist($listing->setBelongsToUser($user));
-
         $this->emailService->notifyAdminAboutNewListing($listing->getSlug());
 
+        $this->entityManager->persist($listing->setBelongsToUser($user));
         $this->entityManager->flush();
     }
 
@@ -81,5 +69,6 @@ class ListingService implements EntityServiceInterface
         $this->entityManager->remove($listing);
         $this->entityManager->flush();
     }
+
 
 }
