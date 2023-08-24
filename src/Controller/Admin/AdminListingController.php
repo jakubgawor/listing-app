@@ -3,7 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Listing;
-use App\Form\Handler\EntityFormHandler;
+use App\Form\Handler\ListingFormHandler;
 use App\Repository\ListingRepository;
 use App\Service\AdminService;
 use App\Service\ListingService;
@@ -16,9 +16,9 @@ class AdminListingController extends AbstractController
 {
     public function __construct(
         private readonly ListingRepository $listingRepository,
-        private readonly EntityFormHandler $entityFormHandler,
         private readonly ListingService    $listingService,
-        private readonly AdminService      $adminService
+        private readonly AdminService      $adminService,
+        private readonly ListingFormHandler $listingFormHandler,
     )
     {
     }
@@ -53,7 +53,7 @@ class AdminListingController extends AbstractController
     #[Route('/admin/listing/{slug}/edit', name: 'app_admin_edit')]
     public function edit(?Listing $listing, Request $request): Response
     {
-        $form = $this->entityFormHandler->handle($listing->getBelongsToUser(), $request, $listing, $this->listingService);
+        $form = $this->listingFormHandler->handle($request, $listing->getBelongsToUser(), $listing);
 
         if ($form === true) {
             $this->addFlash('success', 'Listing has been updated!');
