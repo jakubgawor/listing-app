@@ -9,8 +9,10 @@ use App\Repository\UserRepository;
 use App\Security\EmailVerifier;
 use App\Service\Config\AppConfig;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Mime\Address;
+use SymfonyCasts\Bundle\ResetPassword\Model\ResetPasswordToken;
 use Twig\Environment;
 
 class EmailService
@@ -20,7 +22,8 @@ class EmailService
         private UserRepository      $userRepository,
         private Environment         $twig,
         private AppConfig           $appConfig,
-        private EmailVerifier       $emailVerifier
+        private EmailVerifier       $emailVerifier,
+        private MailerInterface     $mailer,
     )
     {
     }
@@ -58,5 +61,19 @@ class EmailService
                 ->subject('Please Confirm your Email')
                 ->htmlTemplate('registration/confirmation_email.html.twig')
         );
+    }
+
+    public function sendPasswordResetEmail(User $user, ResetPasswordToken $resetToken): void
+    {
+        $email = (new TemplatedEmail())
+            ->from(new Address('mailer@listing-app.com', 'Listing App'))
+            ->to($user->getEmail())
+            ->subject('Your password reset request')
+            ->htmlTemplate('reset_password/email.html.twig')
+            ->context([
+                'resetToken' => $resetToken,
+            ]);
+
+        $this->mailer->send($email);
     }
 }
