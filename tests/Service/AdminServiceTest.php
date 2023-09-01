@@ -81,6 +81,8 @@ class AdminServiceTest extends TestCase
         $user->method('getRoles')->willReturn([UserRoleEnum::ROLE_USER_EMAIL_VERIFIED]);
 
         $user->expects($this->once())->method('setRoles')->with([UserRoleEnum::ROLE_ADMIN]);
+        $this->entityManager->expects($this->once())->method('persist')->with($user);
+        $this->entityManager->expects($this->once())->method('flush');
 
         $this->adminService->promoteToAdmin($user);
     }
@@ -90,9 +92,7 @@ class AdminServiceTest extends TestCase
     {
         $user = $this->createMock(User::class);
         $user->method('getRoles')->willReturn([UserRoleEnum::ROLE_ADMIN]);
-
         $this->security->method('getUser')->willReturn($user);
-
 
         $this->expectException(AdminDegradationException::class);
 
@@ -116,7 +116,7 @@ class AdminServiceTest extends TestCase
         $user = $this->createMock(User::class);
         $user->method('getRoles')->willReturn([UserRoleEnum::ROLE_ADMIN]);
 
-        $this->entityManager->expects($this->exactly(2))->method('persist');
+        $this->entityManager->expects($this->exactly(2))->method('persist')->with($user);
         $this->entityManager->expects($this->once())->method('flush');
 
         $this->adminService->degradeToUser($user);
@@ -150,9 +150,7 @@ class AdminServiceTest extends TestCase
         $user = $this->createMock(User::class);
         $user->method('isBanned')->willReturn(false);
         $user->method('getRoles')->willReturn([UserRoleEnum::ROLE_USER_EMAIL_VERIFIED]);
-
         $listing = $this->createMock(Listing::class);
-
         $user->method('getListings')->willReturn(new ArrayCollection([$listing]));
 
         $this->entityManager->expects($this->once())->method('remove')->with($listing);
