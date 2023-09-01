@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 class SlugTraitTest extends TestCase
 {
     /** @test */
-    public function create_slug()
+    public function createSlug_works_correctly()
     {
         $slugTrait = new class {
             use SlugTrait;
