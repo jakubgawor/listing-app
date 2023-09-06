@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Controller\UserProfile;
+namespace App\Tests\functional\Controller\UserProfile;
 
 use App\Entity\User;
 use App\Entity\UserProfile;

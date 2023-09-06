@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Controller\Admin\User;
+namespace App\Tests\functional\Controller\Admin\User;
 
 use App\Entity\User;
 use App\Enum\UserRoleEnum;

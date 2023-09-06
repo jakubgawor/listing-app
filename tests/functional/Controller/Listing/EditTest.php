@@ -1,36 +1,33 @@
 <?php
 
-namespace App\Tests\Controller\Admin\Listing;
+namespace App\Tests\functional\Controller\Listing;
 
 use App\Entity\Listing;
 use App\Enum\ListingStatusEnum;
-use App\Enum\UserRoleEnum;
 use App\Tests\Builder\EntityBuilder;
 use Doctrine\ORM\EntityRepository;
 use Faker\Factory;
 use Faker\Generator;
-use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
 class EditTest extends EntityBuilder
 {
     private EntityRepository $repository;
     private Generator $faker;
-    private KernelBrowser $client;
 
     public function setUp(): void
     {
-        $this->client = static::createClient()->loginUser($this->createUser(['role' => UserRoleEnum::ROLE_ADMIN]));
         $this->repository = static::getContainer()->get('doctrine')->getManager()->getRepository(Listing::class);
         $this->faker = Factory::create();
 
         self::ensureKernelShutdown();
     }
 
-    public function testAdminCanEditSomeoneListing(): void
+    public function testUserCanEditHisOwnListing(): void
     {
-        $client = $this->client;
-
+        $client = static::createClient();
         $author = $this->createUser();
+        $client->loginUser($author);
+
         $listing = $this->createListing(
             $this->faker->realText(15),
             $this->faker->realText(20),
@@ -44,7 +41,7 @@ class EditTest extends EntityBuilder
         $title = $this->faker->realText(15);
         $description = $this->faker->realText(20);
 
-        $crawler = $client->request('GET', '/admin/listing/' . $oldSlug . '/edit');
+        $crawler = $client->request('GET', '/listing/' . $oldSlug . '/edit');
         $form = $crawler->selectButton('Edit listing')->form([
             'listing_form[title]' => $title,
             'listing_form[description]' => $description
@@ -59,17 +56,9 @@ class EditTest extends EntityBuilder
         ]);
 
         $this->assertNull($this->repository->findOneBy(['slug' => $oldSlug]));
-        $this->assertSame(ListingStatusEnum::VERIFIED, $editedListing->getStatus());
         $this->assertNotNull($editedListing);
+        $this->assertSame(ListingStatusEnum::NOT_VERIFIED, $editedListing->getStatus());
         $this->assertNotNull($editedListing->getEditedAt());
     }
 
-    public function testAdminCanNotEditNotExistingListing(): void
-    {
-        $client = $this->client;
-
-        $client->request('GET', '/admin/listing/not-existing/edit');
-
-        $this->assertSame(['Object not found'], $client->getRequest()->getSession()->getFlashBag()->get('error'));
-    }
 }

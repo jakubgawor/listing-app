@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Controller\Admin\Listing;
+namespace App\Tests\functional\Controller\Admin\Listing;
 
 use App\Entity\Listing;
 use App\Enum\ListingStatusEnum;

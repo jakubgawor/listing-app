@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Controller\Listing;
+namespace App\Tests\functional\Controller\Listing;
 
 use App\Enum\ListingStatusEnum;
 use App\Enum\UserRoleEnum;

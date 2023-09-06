@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Controller\Auth;
+namespace App\Tests\functional\Controller\Auth;
 
 use App\Tests\Builder\EntityBuilder;
 
