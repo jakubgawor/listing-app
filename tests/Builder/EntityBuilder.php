@@ -9,6 +9,7 @@ use App\Entity\UserProfile;
 use App\Enum\UserRoleEnum;
 use App\Repository\CategoryRepository;
 use App\Repository\ListingRepository;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Faker\Factory;
 use Faker\Generator;
@@ -22,6 +23,7 @@ class EntityBuilder extends WebTestCase implements EntityBuilderInterface
     protected EntityManagerInterface $entityManager;
     protected ListingRepository $listingRepository;
     protected CategoryRepository $categoryRepository;
+    protected UserRepository $userRepository;
     protected Generator $faker;
 
     public function setUp(): void
@@ -31,6 +33,7 @@ class EntityBuilder extends WebTestCase implements EntityBuilderInterface
         $this->entityManager = self::getContainer()->get('doctrine')->getManager();
         $this->listingRepository = $this->entityManager->getRepository(Listing::class);
         $this->categoryRepository = $this->entityManager->getRepository(Category::class);
+        $this->userRepository = $this->entityManager->getRepository(User::class);
 
         $this->faker = Factory::create();
     }
