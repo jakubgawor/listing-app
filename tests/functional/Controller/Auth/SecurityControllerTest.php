@@ -7,21 +7,23 @@ use App\Tests\Builder\EntityBuilder;
 class SecurityControllerTest extends EntityBuilder
 {
     /** @test */
-    public function logout_works_correctly(): void
+    public function logout_works_correctly()
     {
         $this->client->loginUser($this->createUser())->request('GET', '/logout');
 
         $this->assertResponseStatusCodeSame(302);
     }
 
-    public function testUserCanNotLogOutWhileNotLoggedIn(): void
+    /** @test */
+    public function user_can_not_logout_while_not_logged_in()
     {
         $this->client->loginUser($this->createUser())->request('GET', '/logout');
 
         $this->assertResponseStatusCodeSame(302);
     }
 
-    public function testUserCanNotRenderLoginPageWhileLoggedIn(): void
+    /** @test */
+    public function user_can_not_render_login_page_while_logged_in()
     {
         $this->client->loginUser($this->createUser())->request('GET', '/login');
 
