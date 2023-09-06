@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Service;
+namespace App\Tests\unit\Service;
 
 use App\Entity\Listing;
 use App\Entity\User;

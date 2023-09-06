@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Service;
+namespace App\Tests\unit\Service;
 
 use App\DTO\ChangePasswordDTO;
 use App\Entity\User;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Service\Config;
+namespace App\Tests\unit\Service\Config;
 
 use App\Service\Config\AppConfig;
 use PHPUnit\Framework\TestCase;

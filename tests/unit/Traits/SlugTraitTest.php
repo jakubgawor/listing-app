@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Traits;
+namespace App\Tests\unit\Traits;
 
 use App\Traits\SlugTrait;
 use PHPUnit\Framework\TestCase;
