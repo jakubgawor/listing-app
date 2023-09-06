@@ -7,15 +7,37 @@ use App\Entity\Listing;
 use App\Entity\User;
 use App\Entity\UserProfile;
 use App\Enum\UserRoleEnum;
+use App\Repository\CategoryRepository;
+use App\Repository\ListingRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Faker\Factory;
+use Faker\Generator;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-abstract class EntityBuilder extends WebTestCase implements EntityBuilderInterface
+class EntityBuilder extends WebTestCase implements EntityBuilderInterface
 {
+    protected KernelBrowser $client;
+    protected EntityManagerInterface $entityManager;
+    protected ListingRepository $listingRepository;
+    protected CategoryRepository $categoryRepository;
+    protected Generator $faker;
+
+    public function setUp(): void
+    {
+        $this->client = static::createClient();
+
+        $this->entityManager = self::getContainer()->get('doctrine')->getManager();
+        $this->listingRepository = $this->entityManager->getRepository(Listing::class);
+        $this->categoryRepository = $this->entityManager->getRepository(Category::class);
+
+        $this->faker = Factory::create();
+    }
+
     public function createUser(array $data = []): User
     {
         $passwordHasher = self::getContainer()->get(UserPasswordHasherInterface::class);
-        $entityManager = self::getContainer()->get('doctrine')->getManager();
         $uniqueId = uniqid();
 
         $userData = [
@@ -42,16 +64,14 @@ abstract class EntityBuilder extends WebTestCase implements EntityBuilderInterfa
             ->setIsBanned($userData['isBanned'])
             ->setUserProfile((new UserProfile)->setUser($user)->setPhoneNumber($userData['phoneNumber']));
 
-        $entityManager->persist($user);
-        $entityManager->flush();
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
 
         return $user;
     }
 
     public function createListing(string $title, string $description, string $status, User $user, Category $category): Listing
     {
-        $entityManager = self::getContainer()->get('doctrine')->getManager();
-
         $listing = new Listing;
         $listing
             ->setTitle($title)
@@ -60,24 +80,22 @@ abstract class EntityBuilder extends WebTestCase implements EntityBuilderInterfa
             ->setBelongsToUser($user)
             ->setCategory($category);
 
-        $entityManager->persist($user->addListing($listing));
-        $entityManager->persist($listing);
-        $entityManager->flush();
+        $this->entityManager->persist($user->addListing($listing));
+        $this->entityManager->persist($listing);
+        $this->entityManager->flush();
 
         return $listing;
     }
 
     public function createCategory(string $categoryName, User $addedBy): Category
     {
-        $entityManager = self::getContainer()->get('doctrine')->getManager();
-
         $category = (new Category)
             ->setCategory($categoryName)
             ->setAddedBy($addedBy);
 
-        $entityManager->persist($addedBy->addCategory($category));
-        $entityManager->persist($category);
-        $entityManager->flush();
+        $this->entityManager->persist($addedBy->addCategory($category));
+        $this->entityManager->persist($category);
+        $this->entityManager->flush();
 
         return $category;
     }

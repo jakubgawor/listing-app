@@ -5,26 +5,17 @@ namespace App\Tests\Builder\tests;
 use App\Enum\ListingStatusEnum;
 use App\Enum\UserRoleEnum;
 use App\Tests\Builder\EntityBuilder;
-use Faker\Factory;
-use Faker\Generator;
 
 class EntityBuilderTest extends EntityBuilder
 {
-    private Generator $faker;
-
-    public function setUp(): void
-    {
-        $this->faker = Factory::create();
-    }
-
-    public function testCreateUserBuilderByDefaultData(): void
+    public function testCreateUserBuilderByDefaultData()
     {
         $user = $this->createUser();
 
         $this->assertNotNull($user);
     }
 
-    public function testCreateUserBuilderByCustomData(): void
+    public function testCreateUserBuilderByCustomData()
     {
         $uniqueId = uniqid();
         $phoneNumber = (string)random_int(111111111, 999999999);
@@ -41,7 +32,7 @@ class EntityBuilderTest extends EntityBuilder
         $this->assertNotNull($user);
     }
 
-    public function testCreateListingBuilder(): void
+    public function testCreateListingBuilder()
     {
         $author = $this->createUser();
 
@@ -62,7 +53,7 @@ class EntityBuilderTest extends EntityBuilder
         $this->assertSame($category->getCategory(), $listing->getCategory()->getCategory());
     }
 
-    public function testCreateCategoryBuilder(): void
+    public function testCreateCategoryBuilder()
     {
         $categoryName = $this->faker->realText(10) . uniqid();
         $createdBy = $this->createUser(['role' => UserRoleEnum::ROLE_ADMIN]);
