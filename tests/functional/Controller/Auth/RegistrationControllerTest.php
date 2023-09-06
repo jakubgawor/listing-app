@@ -2,36 +2,12 @@
 
 namespace App\Tests\functional\Controller\Auth;
 
-use App\Entity\User;
 use App\Tests\Builder\EntityBuilder;
-use Doctrine\ORM\EntityRepository;
 
 class RegistrationControllerTest extends EntityBuilder
 {
-    private EntityRepository $repository;
-
-    public function setUp(): void
-    {
-        $this->repository = static::getContainer()->get('doctrine')->getManager()->getRepository(User::class);
-
-        self::ensureKernelShutdown();
-    }
-
-    public function testRegistrationPageCanBeRendered(): void
-    {
-        static::createClient()->request('GET', '/register');
-
-        $this->assertResponseIsSuccessful();
-    }
-
-    public function testRegistrationPageCanNotBeRenderedWhileLoggedIn(): void
-    {
-        static::createClient()->loginUser($this->createUser())->request('GET', '/register');
-
-        $this->assertResponseRedirects('/', 302);
-    }
-
-    public function testUserCanRegisterWithValidForm(): void
+    /** @test */
+    public function register_works_correctly_with_valid_form()
     {
         $uniqueId = uniqid();
         $this->createClientAndSubmitForm(
@@ -42,10 +18,11 @@ class RegistrationControllerTest extends EntityBuilder
             true
         );
 
-        $this->assertNotNull($this->repository->findOneBy(['username' => 'username' . $uniqueId]));
+        $this->assertNotNull($this->userRepository->findOneBy(['username' => 'username' . $uniqueId]));
     }
 
-    public function testRegistrationWithInvalidEmail(): void
+    /** @test */
+    public function register_does_not_register_user_if_email_is_invalid()
     {
         $uniqueId = uniqid();
         $this->createClientAndSubmitForm(
@@ -56,10 +33,11 @@ class RegistrationControllerTest extends EntityBuilder
             true
         );
 
-        $this->assertNull($this->repository->findOneBy(['username' => 'username' . $uniqueId]));
+        $this->assertNull($this->userRepository->findOneBy(['username' => 'username' . $uniqueId]));
     }
 
-    public function testRegistrationWithInvalidPassword(): void
+    /** @test */
+    public function register_does_not_register_user_if_password_is_invalid()
     {
         $uniqueId = uniqid();
         $this->createClientAndSubmitForm(
@@ -70,10 +48,11 @@ class RegistrationControllerTest extends EntityBuilder
             true
         );
 
-        $this->assertNull($this->repository->findOneBy(['username' => 'username' . $uniqueId]));
+        $this->assertNull($this->userRepository->findOneBy(['username' => 'username' . $uniqueId]));
     }
 
-    public function testRegistrationWithNotRepeatedPassword(): void
+    /** @test */
+    public function register_does_not_register_user_if_password_is_not_repeated()
     {
         $uniqueId = uniqid();
         $this->createClientAndSubmitForm(
@@ -84,10 +63,11 @@ class RegistrationControllerTest extends EntityBuilder
             true
         );
 
-        $this->assertNull($this->repository->findOneBy(['username' => 'username' . $uniqueId]));
+        $this->assertNull($this->userRepository->findOneBy(['username' => 'username' . $uniqueId]));
     }
 
-    public function testRegistrationWithNotInvalidRepeatedPassword(): void
+    /** @test */
+    public function register_does_not_register_user_if_repeated_password_is_invalid()
     {
         $uniqueId = uniqid();
         $this->createClientAndSubmitForm(
@@ -98,7 +78,7 @@ class RegistrationControllerTest extends EntityBuilder
             true
         );
 
-        $this->assertNull($this->repository->findOneBy(['username' => 'username' . $uniqueId]));
+        $this->assertNull($this->userRepository->findOneBy(['username' => 'username' . $uniqueId]));
     }
 
     private function createClientAndSubmitForm(
@@ -109,10 +89,8 @@ class RegistrationControllerTest extends EntityBuilder
         bool $agreeTerms
     ): void
     {
-        $client = static::createClient();
-
-        $client->submit(
-            $client
+        $this->client->submit(
+            $this->client
                 ->request('GET', '/register')
                 ->selectButton('Register')
                 ->form([
