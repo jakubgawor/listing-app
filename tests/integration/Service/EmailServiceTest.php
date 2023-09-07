@@ -19,6 +19,13 @@ class EmailServiceTest extends EntityBuilder
 {
     use InteractsWithMessenger;
 
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->transport('async')->reset();
+    }
+
     /** @test */
     public function notifyAdminAboutNewListing_works_correctly()
     {
@@ -51,6 +58,11 @@ class EmailServiceTest extends EntityBuilder
         $this->transport('async')->dispatched()->assertCount(2);
     }
 
+    /** @test */
+    public function notifyUserAboutListingVerification_works_correctly()
+    {
+
+    }
 
 
 }
