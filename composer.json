@@ -103,6 +103,7 @@
         "symfony/maker-bundle": "^1.50",
         "symfony/phpunit-bridge": "^6.3",
         "symfony/stopwatch": "6.3.*",
-        "symfony/web-profiler-bundle": "6.3.*"
+        "symfony/web-profiler-bundle": "6.3.*",
+        "zenstruck/messenger-test": "^1.7"
     }
 }
