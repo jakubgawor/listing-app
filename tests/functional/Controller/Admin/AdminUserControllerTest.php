@@ -9,6 +9,14 @@ use App\Tests\Builder\EntityBuilder;
 class AdminUserControllerTest extends EntityBuilder
 {
     /** @test */
+    public function users_render_correctly()
+    {
+        $this->client->loginUser($this->createUser(['role' => UserRoleEnum::ROLE_ADMIN]))->request('GET', '/admin/users');
+
+        $this->assertResponseIsSuccessful();
+    }
+
+    /** @test */
     public function deleteUser_works_correctly()
     {
         $this->client->loginUser($this->createUser(['role' => UserRoleEnum::ROLE_ADMIN]));

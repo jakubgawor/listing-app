@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Tests\unit\Security;
+namespace App\Tests\unit\Security\Voter;
 
 use App\Entity\User;
 use App\Security\Voter\SameUsernameVoter;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class SameUsernameVoterTest extends TestCase
 {
@@ -56,7 +57,7 @@ class SameUsernameVoterTest extends TestCase
     public function returns_access_abstain_if_user_is_null()
     {
         $tokenMock = $this->createMock(TokenInterface::class);
-            $tokenMock->method('getUser')
+        $tokenMock->method('getUser')
             ->willReturn(null);
 
         $result = $this->voter->vote(

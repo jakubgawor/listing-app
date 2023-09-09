@@ -9,6 +9,14 @@ use App\Tests\Builder\EntityBuilder;
 class AdminCategoryControllerTest extends EntityBuilder
 {
     /** @test */
+    public function categories_renders_correctly()
+    {
+        $this->client->loginUser($this->createUser(['role' => UserRoleEnum::ROLE_ADMIN]))->request('GET', '/admin/categories');
+
+        $this->assertResponseIsSuccessful();
+    }
+
+    /** @test */
     public function addCategory_works_correctly()
     {
         $categoryName = uniqid();

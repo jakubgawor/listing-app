@@ -10,6 +10,14 @@ use App\Tests\Builder\EntityBuilder;
 class ListingControllerTest extends EntityBuilder
 {
     /** @test */
+    public function index_renders_correctly()
+    {
+        $this->client->request('GET', '/');
+
+        $this->assertResponseIsSuccessful();
+    }
+
+    /** @test */
     public function create_works_correctly()
     {
         $user = $this->createUser();

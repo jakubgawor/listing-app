@@ -88,4 +88,18 @@ class UserServiceTest extends TestCase
         $this->userService->changePassword($user, $changePasswordDTO);
     }
 
+    /** @test */
+    public function changePassword_works_correctly()
+    {
+        $user = $this->createMock(User::class);
+        $changePasswordDTO = $this->createMock(ChangePasswordDTO::class);
+        $this->userPasswordHasher->method('isPasswordValid')->willReturn(true);
+
+
+        $this->entityManager->expects($this->once())->method('persist')->with($user);
+        $this->entityManager->expects($this->once())->method('flush');
+
+        $this->userService->changePassword($user, $changePasswordDTO);
+
+    }
 }

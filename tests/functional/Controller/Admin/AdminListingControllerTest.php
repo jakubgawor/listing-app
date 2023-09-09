@@ -10,6 +10,30 @@ use App\Tests\Builder\EntityBuilder;
 class AdminListingControllerTest extends EntityBuilder
 {
     /** @test */
+    public function showListings_renders_correctly()
+    {
+        $this->client->loginUser($this->createUser(['role' => UserRoleEnum::ROLE_ADMIN]))->request('GET', '/admin/listings');
+
+        $this->assertResponseIsSuccessful();
+    }
+
+    /** @test */
+    public function showListing_renders_correctly()
+    {
+        $listing = $this->createListing(
+            $this->faker->realText(15),
+            $this->faker->realText(15),
+            ListingStatusEnum::VERIFIED,
+            $this->createUser(),
+            $this->createCategory(uniqid(), $this->createUser())
+        );
+
+        $this->client->loginUser($this->createUser(['role' => UserRoleEnum::ROLE_ADMIN]))->request('GET', '/admin/listing/' . $listing->getSlug());
+
+        $this->assertResponseIsSuccessful();
+    }
+
+    /** @test */
     public function verify_works_correctly_if_listing_is_not_verified()
     {
         $listing = $this->createListing(
