@@ -7,6 +7,14 @@ use App\Tests\Builder\EntityBuilder;
 class SecurityControllerTest extends EntityBuilder
 {
     /** @test */
+    public function logged_user_is_redirected_if_trying_to_access_login_page()
+    {
+        $this->client->loginUser($this->createUser())->request('GET', '/login');
+
+        $this->assertResponseRedirects('/');
+    }
+
+    /** @test */
     public function logout_works_correctly()
     {
         $this->client->loginUser($this->createUser())->request('GET', '/logout');
