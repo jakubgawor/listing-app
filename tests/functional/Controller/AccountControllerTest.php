@@ -116,4 +116,22 @@ class AccountControllerTest extends EntityBuilder
         $this->assertResponseRedirects('/', 302);
     }
 
+    /** @test */
+    public function changePassword_works_correctly()
+    {
+        $user = $this->createUser();
+        $oldPassword = $user->getPassword();
+
+        $this->client
+            ->loginUser($user)->submit(
+                $this->client->request('GET', '/user/' . $user->getUsername() . '/change-password')
+                    ->selectButton('Update password')
+                    ->form([
+                        'change_password_form[old_password]' => 'test_password',
+                        'change_password_form[new_password]' => 'new_password'
+                    ]));
+
+        $this->assertNotSame($oldPassword, $this->userRepository->findOneBy(['id' => $user->getId()])->getPassword());
+    }
+
 }
