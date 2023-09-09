@@ -9,6 +9,19 @@ use App\Tests\Builder\EntityBuilder;
 class UserRepositoryTest extends EntityBuilder
 {
     /** @test */
+    public function upgradePassword_works_correctly()
+    {
+        $user = $this->createUser();
+        $oldPassword = $user->getPassword();
+
+        $newHashedPassword = password_hash('new_password', PASSWORD_BCRYPT);
+
+        $this->userRepository->upgradePassword($user, $newHashedPassword);
+
+        $this->assertNotSame($oldPassword, $user->getPassword());
+    }
+
+    /** @test */
     public function findAllAdmins_works_correctly()
     {
         $this->createUser(['role' => UserRoleEnum::ROLE_ADMIN]);
