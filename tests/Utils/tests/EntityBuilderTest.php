@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Tests\Builder\tests;
+namespace App\Tests\Utils\tests;
 
 use App\Enum\ListingStatusEnum;
 use App\Enum\UserRoleEnum;
-use App\Tests\Builder\EntityBuilder;
+use App\Tests\Utils\EntityBuilder;
 
 class EntityBuilderTest extends EntityBuilder
 {

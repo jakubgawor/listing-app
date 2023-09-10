@@ -2,7 +2,7 @@
 
 namespace App\Tests\functional\Controller\Auth;
 
-use App\Tests\Builder\EntityBuilder;
+use App\Tests\Utils\EntityBuilder;
 
 class RegistrationControllerTest extends EntityBuilder
 {

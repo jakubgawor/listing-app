@@ -4,7 +4,7 @@ namespace App\Tests\integration\Repository;
 
 use App\Entity\User;
 use App\Enum\UserRoleEnum;
-use App\Tests\Builder\EntityBuilder;
+use App\Tests\Utils\EntityBuilder;
 
 class UserRepositoryTest extends EntityBuilder
 {

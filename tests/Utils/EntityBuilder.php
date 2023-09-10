@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Builder;
+namespace App\Tests\Utils;
 
 use App\Entity\Category;
 use App\Entity\Listing;

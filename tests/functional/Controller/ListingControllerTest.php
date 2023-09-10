@@ -5,7 +5,7 @@ namespace App\Tests\functional\Controller;
 use App\Entity\Listing;
 use App\Enum\ListingStatusEnum;
 use App\Enum\UserRoleEnum;
-use App\Tests\Builder\EntityBuilder;
+use App\Tests\Utils\EntityBuilder;
 
 class ListingControllerTest extends EntityBuilder
 {

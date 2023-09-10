@@ -9,7 +9,7 @@ use App\Repository\UserRepository;
 use App\Security\EmailVerifier;
 use App\Service\Config\AppConfig;
 use App\Service\EmailService;
-use App\Tests\Builder\EntityBuilder;
+use App\Tests\Utils\EntityBuilder;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;

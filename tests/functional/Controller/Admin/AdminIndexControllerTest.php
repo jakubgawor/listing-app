@@ -3,7 +3,7 @@
 namespace App\Tests\functional\Controller\Admin;
 
 use App\Enum\UserRoleEnum;
-use App\Tests\Builder\EntityBuilder;
+use App\Tests\Utils\EntityBuilder;
 
 class AdminIndexControllerTest extends EntityBuilder
 {

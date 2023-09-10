@@ -4,7 +4,7 @@ namespace App\Tests\integration\Repository;
 
 use App\Entity\Listing;
 use App\Enum\ListingStatusEnum;
-use App\Tests\Builder\EntityBuilder;
+use App\Tests\Utils\EntityBuilder;
 
 class ListingRepositoryTest extends EntityBuilder
 {

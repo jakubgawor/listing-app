@@ -3,7 +3,7 @@
 namespace App\Tests\functional\Controller;
 
 use App\Entity\ResetPasswordRequest;
-use App\Tests\Builder\EntityBuilder;
+use App\Tests\Utils\EntityBuilder;
 
 class ResetPasswordControllerTest extends EntityBuilder
 {
